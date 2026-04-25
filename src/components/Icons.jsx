@@ -37,6 +37,11 @@ import './Icons.css';
 function MaskIcon({ src, size = 24, width, height, className = '', style = {} }) {
   const w = width  ?? size;
   const h = height ?? size;
+  // CSS-safe quoting: production builds inline small SVGs as
+  // `data:image/svg+xml,%3csvg…xmlns='…'…%3c/svg%3e` URLs whose single
+  // quotes break an unquoted `url(...)`. Wrap in double quotes so the
+  // single quotes inside are contained.
+  const url = `url("${src}")`;
   return (
     <span
       aria-hidden="true"
@@ -44,8 +49,8 @@ function MaskIcon({ src, size = 24, width, height, className = '', style = {} })
       style={{
         width: w,
         height: h,
-        WebkitMaskImage: `url(${src})`,
-        maskImage: `url(${src})`,
+        WebkitMaskImage: url,
+        maskImage: url,
         ...style,
       }}
     />
