@@ -1,570 +1,479 @@
 /* ══════════════════════════════════════════════════════════════════
-   CommunityScreen — pixel-perfect match to Figma node 167:7091
+   CommunityScreen — Figma 82:20018
+   Profile container: px-20, gap-32 col, vertical-scroll
    ══════════════════════════════════════════════════════════════════ */
-
-.cs-wrapper {
-  flex: 1;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  background: #f5f5f5;
-}
 
 .cs-root {
   flex: 1;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 12px 20px 96px; /* bottom padding for FAB */
-  background: #f5f5f5;
+  padding: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
   scrollbar-width: none;
+  background: #e0eaeb;
+  min-height: 0;
 }
 .cs-root::-webkit-scrollbar { display: none; }
 
-/* ── Tab bar ───────────────────────────────────────────────────── */
-/* Figma: bg-white p-[4px] rounded-[233px] */
-.cs-tabbar {
-  display: flex;
-  background: #ffffff;
-  border-radius: 233px;
-  padding: 4px;
-  height: 44px;
+/* ══════════════════════════════════════════════════════════════════
+   Sticky cluster — opaque teal block holding the friends card AND the
+   requests header so nothing leaks through the gap when scrolling.
+   ══════════════════════════════════════════════════════════════════ */
+.cs-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 6;
   flex-shrink: 0;
-}
-
-.cs-tab {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  cursor: pointer;
-  border-radius: 100px;
-  background: transparent;
-  font-family: 'SF Pro', -apple-system, 'Helvetica Neue', 'Roboto', sans-serif;
-  font-size: 15px;
-  font-weight: 510;
-  line-height: 20px;
-  letter-spacing: -0.23px;
-  color: #1a1a1a;
-  transition: background 0.2s, color 0.2s;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  padding: 8px 18px;
-}
-
-/* Figma: active tab — bg-[var(--secondary/70,#2e3b3b)], white text, bold */
-.cs-tab.active {
-  background: #2e3b3b;
-  color: #f5f5f5;
-  font-weight: 700;
-}
-
-/* ── Nearby indicator ──────────────────────────────────────────── */
-.cs-nearby {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.cs-nearby-icon {
-  width: 24px;
-  height: 24px;
-  display: block;
-  flex-shrink: 0;
-}
-
-.cs-nearby-text {
-  font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 1.4;
-  color: #1e1e1e;
-  white-space: nowrap;
-}
-
-/* ── Cards container ───────────────────────────────────────────── */
-.cs-cards {
+  background: #e0eaeb;     /* same as app bg — fully covers scroll content */
   display: flex;
   flex-direction: column;
+}
+
+/* ── Dark My Friends card (inside the sticky cluster) ────── */
+.cs-friends-card {
+  flex-shrink: 0;
+  margin: 4px 16px 0;
+  padding: 16px;
+  background: #2e3b3b;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+.cs-friends-title {
+  margin: 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.1px;
+}
+
+/* Horizontal scroll inside the dark card */
+.cs-friends-row {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  margin: 0 -16px;
+  padding: 2px 16px 4px;
+}
+.cs-friends-row::-webkit-scrollbar { display: none; }
+
+.cs-friend-card {
+  flex-shrink: 0;
+  width: 152px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
   gap: 8px;
 }
 
-/* ── Individual request card ───────────────────────────────────── */
-/* Figma: bg-white rounded-[20px] px-[16px] py-[12px] gap-[12px] */
-.cs-card {
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 12px 16px;
+/* ── Ride Requests header (inside the sticky cluster) ────── */
+.cs-requests-header {
+  flex-shrink: 0;
+  background: #e0eaeb;
+  padding: 16px 20px 12px;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-/* ── Avatar + identity ─────────────────────────────────────────── */
-.cs-card-header {
+.cs-section-title {
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 28px;
+  color: #1a1a1a;
+  margin: 0;
+}
+.cs-friend-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 233px;
+  background: #d1d5d9;
   display: flex;
-  gap: 8px;
   align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e1e1e;
 }
 
-.cs-avatar {
-  width: 54px;
-  height: 54px;
+/* Profile-photo avatar (img) — circular, used for friends + ride cards */
+.cs-avatar-img {
   border-radius: 50%;
   object-fit: cover;
-  display: block;
   flex-shrink: 0;
-  background: #e5e7eb;
+  background: #d1d5d9;
+  display: block;
 }
-
-.cs-card-identity {
-  flex: 1;
-  min-width: 0;
+/* Initials fallback when the photo URL fails to load */
+.cs-avatar-fallback {
+  border-radius: 50%;
+  background: #d1d5d9;
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e1e1e;
+  flex-shrink: 0;
+}
+.cs-friend-text { flex: 1; min-width: 0; }
+.cs-friend-name {
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: 0.15px;
+  color: #49454f;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cs-friend-rides {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+  color: #49454f;
+  margin: 0;
+  white-space: nowrap;
 }
 
-.cs-card-name {
+/* ── Filter row (Today + 5Km selects) ─────────────────── */
+.cs-filter-row {
+  display: flex;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.cs-select-wrap {
+  position: relative;
+  flex: 1;
+}
+.cs-select {
+  width: 100%;
+  height: 44px;
+  background: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  padding: 12px 12px 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
   font-family: 'Inter', 'Roboto', sans-serif;
   font-size: 16px;
+  font-weight: 400;
+  line-height: 1;
+  color: #1e1e1e;
+  transition: border-color 0.15s ease;
+}
+.cs-select.open { border-color: #ff6038; }
+.cs-select-value {
+  flex: 1;
+  text-align: left;
+}
+
+/* Dropdown menu */
+.cs-select-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  background: #ffffff;
+  border: 1px solid #e8f0f0;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 30;
+  animation: cs-menu-in 0.14s ease both;
+}
+@keyframes cs-menu-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+.cs-select-opt {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 15px;
+  color: #1e1e1e;
+  transition: background 0.12s ease;
+}
+.cs-select-opt:hover { background: #f5f5f5; }
+.cs-select-opt.active {
+  background: rgba(255, 96, 56, 0.08);
+  color: #e85733;
+  font-weight: 600;
+}
+
+/* ── Ride list — only thing that scrolls ─────────────── */
+.cs-ride-list {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 16px 24px;
+}
+
+.cs-empty {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  color: #757575;
+  text-align: center;
+  padding: 40px 0;
+  margin: 0;
+}
+
+/* ── Ride card — Figma 83:21073 ─────────────────────── */
+.cs-ride-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex-shrink: 0;
+  /* Animate height + opacity when the card is dismissed */
+  transition:
+    opacity 0.32s ease,
+    transform 0.32s ease,
+    max-height 0.36s ease 0.04s,
+    margin 0.36s ease 0.04s,
+    padding 0.36s ease 0.04s;
+}
+.cs-ride-card.accepted {
+  /* Soft confirmation tint while the 5s countdown elapses */
+  background: rgba(255, 96, 56, 0.05);
+}
+.cs-ride-card.dismissing {
+  opacity: 0;
+  transform: scale(0.97);
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: -12px;        /* collapse the gap from the parent flex gap */
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.cs-ride-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cs-ride-when {
+  flex: 1;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.4px;
+  color: #1e1e1e;
+  margin: 0;
+}
+.cs-ride-divider { height: 1px; background: #e8f0f0; }
+
+.cs-ride-user { display: flex; align-items: center; gap: 8px; }
+.cs-ride-avatar {
+  flex-shrink: 0;
+  width: 41px;
+  height: 41px;
+  border-radius: 50%;
+  background: #d1d5d9;
+}
+.cs-ride-user-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.cs-ride-name-row { display: flex; align-items: center; gap: 10px; }
+.cs-ride-name {
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 14px;
   font-weight: 600;
   line-height: 1.4;
   color: #1e1e1e;
 }
-
-.cs-verified-row {
-  display: flex;
-  gap: 4px;
-  align-items: center;
+.cs-ride-mutuals { display: flex; align-items: center; gap: 5px; }
+.cs-mutual-dots { display: flex; gap: 2px; }
+.cs-mutual-dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #d9d9d9;
+  border: 1.5px solid #ffffff;
 }
-
-.cs-verified-icon {
-  width: 20px;
-  height: 20px;
-  display: block;
-  flex-shrink: 0;
-}
-
-.cs-verified-text {
+.cs-mutual-text {
   font-family: 'Inter', 'Roboto', sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 1.4;
-  color: #727272;
-  white-space: nowrap;
+  color: #1e1e1e;
 }
 
-/* ── Route info ────────────────────────────────────────────────── */
-.cs-route {
+/* Route with vertical connector */
+.cs-ride-route {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+.cs-route-dots {
+  flex-shrink: 0;
+  width: 14px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  border-radius: 10px;
-}
-
-.cs-route-row {
-  display: flex;
-  gap: 8px;
   align-items: center;
+  padding: 4px 0;
 }
-
-.cs-route-icon {
-  width: 24px;
-  height: 24px;
-  display: block;
-  flex-shrink: 0;
+.cs-route-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #ff6038;
+  background: #ffffff;
 }
-
+.cs-route-dot.filled { background: #ff6038; }
+.cs-route-line {
+  flex: 1;
+  width: 2px;
+  margin: 2px 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    #ff6038 0 3px,
+    transparent 3px 6px
+  );
+  min-height: 14px;
+}
 .cs-route-text {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 2px 0;
+}
+.cs-route-place {
   font-family: 'Inter', 'Roboto', sans-serif;
   font-size: 16px;
-  font-weight: 400;
+  font-weight: 600;
   line-height: 1.4;
   color: #1e1e1e;
-  min-width: 0;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.cs-route-text strong {
-  font-weight: 600;
-}
-
-.cs-route-text--regular {
-  font-weight: 400;
-}
-
-.cs-dot {
-  width: 8px;
-  height: 8px;
-  display: block;
-  flex-shrink: 0;
-}
-
-.cs-disclaimer {
+.cs-ride-note {
   font-family: 'Inter', 'Roboto', sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 1.4;
   color: #757575;
-  white-space: nowrap;
-}
-
-/* ── Time row with duration ────────────────────────────────────── */
-.cs-route-time {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-}
-
-/* "(In ~15 min)" */
-.cs-route-duration {
-  font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 1.4;
-  color: #1e1e1e;
-}
-
-/* ── Accepted button (post-accept state, full-width dark) ──────── */
-/* Figma: bg-#2e3b3b, rounded-8px, p-12px, gap-8px, check icon + "Accepted" */
-.cs-accepted-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: #2e3b3b;
-  border-radius: 8px;
-  padding: 12px;
-  width: 100%;
-  /* no cursor:pointer — it's a state display, not interactive */
-  pointer-events: none;
-}
-
-.cs-accepted-check {
-  width: 16px;
-  height: 16px;
-  display: block;
-  flex-shrink: 0;
-  /* The Figma icon is dark — invert to white for the dark bg */
-  filter: brightness(0) invert(1);
-}
-
-/* Figma: Roboto SemiBold 16px, white, tracking 0.15px */
-.cs-accepted-text {
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 24px;
-  letter-spacing: 0.15px;
-  color: #ffffff;
-  white-space: nowrap;
-}
-
-/* ── Action button pair ────────────────────────────────────────── */
-/* Figma: flex gap-[12px] items-start */
-.cs-action-btns {
-  display: flex;
-  gap: 12px;
-  align-items: stretch;
-}
-
-/* Figma: bg-[var(--primary/50,#ff6038)] rounded-[8px] p-[12px] */
-.cs-accept-btn {
-  flex: 1;
-  background: #ff6038;
-  border: none;
-  border-radius: 8px;
-  padding: 12px;
-  cursor: pointer;
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 24px;
-  letter-spacing: 0.15px;
-  color: #f5f5f5;
-  transition: background 0.15s;
-  white-space: nowrap;
-}
-
-/* Figma: bg-[var(--primary/00,#f5f5f5)] text-[color:var(--primary/60,#e85733)] */
-.cs-more-info-btn {
-  flex: 1;
-  background: #f5f5f5;
-  border: none;
-  border-radius: 8px;
-  padding: 12px;
-  cursor: pointer;
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 24px;
-  letter-spacing: 0.15px;
-  color: #e85733;
-  transition: background 0.15s;
-  white-space: nowrap;
-}
-
-/* ── Price ─────────────────────────────────────────────────────── */
-/* Figma: Inter Regular 16px #1e1e1e */
-.cs-price {
-  font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 1.4;
-  color: #1e1e1e;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   Accept notification — glass-morphism toast
-   Figma: node 175:6174 — bg rgba(255,255,255,0.6), blur, shadow
-   ══════════════════════════════════════════════════════════════════ */
-@keyframes cs-toast-in {
-  from { opacity: 0; transform: translateY(12px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0)    scale(1);    }
-}
-
-.cs-accept-toast {
-  /* Anchored just above the bottom nav */
-  position: absolute;
-  bottom: 76px;
-  left: 20px;
-  right: 20px;
-  z-index: 50;
-
-  /* Figma glass: rgba(255,255,255,0.6), blur, shadow */
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 16px;
-  box-shadow: 0px 8px 40px 0px rgba(0, 0, 0, 0.12);
-
-  /* Inner border for the glass look */
-  border: 0.5px solid rgba(255, 255, 255, 0.8);
-
-  padding: 12px 12px 12px 14px;
-  animation: cs-toast-in 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.cs-accept-toast-body {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-/* Figma: SF Pro Bold 13px, tracking -0.26px, rgba(0,0,0,0.85) */
-.cs-accept-toast-title {
-  font-family: -apple-system, 'SF Pro Text', 'Inter', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 16px;
-  letter-spacing: -0.26px;
-  color: rgba(0, 0, 0, 0.85);
-}
-
-/* Figma: SF Pro Regular 13px, tracking -0.104px, rgba(0,0,0,0.85) */
-.cs-accept-toast-desc {
-  font-family: -apple-system, 'SF Pro Text', 'Inter', sans-serif;
-  font-size: 13px;
-  font-weight: 400;
-  line-height: 1.4;
-  letter-spacing: -0.1px;
-  color: rgba(0, 0, 0, 0.75);
-}
-
-/* Inline "My Rides" link inside the toast body */
-.cs-accept-toast-link {
-  background: none;
-  border: none;
-  padding: 0;
-  font-family: inherit;
-  font-size: inherit;
-  font-weight: 600;
-  color: #ff6038;
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  display: inline;
-}
-
-/* ── Initials avatar fallback ──────────────────────────────────── */
-.cs-avatar-initials {
-  background: #2e3b3b;
-  color: #ffffff;
-  font-family: 'Inter', sans-serif;
-  font-size: 18px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  /* width/height/border-radius inherited from .cs-avatar */
-}
-
-/* ── Empty state ───────────────────────────────────────────────── */
-.cs-empty {
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  color: #9ca3af;
-  text-align: center;
-  padding: 32px 0;
-}
-
-/* ── FAB ───────────────────────────────────────────────────────── */
-.cs-fab {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  width: 72px;
-  height: 72px;
-  border-radius: 44px;
-  background: #ff6038;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0px 6px 10px rgba(0,0,0,0.15), 0px 2px 3px rgba(0,0,0,0.3);
-  transition: transform 0.15s;
-  z-index: 20;
-}
-.cs-fab:active { transform: scale(0.96); }
-
-.cs-fab-icon {
-  width: 32px;
-  height: 32px;
-  display: block;
-  filter: brightness(0) invert(1);
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   Card fade-out animation (accepted rides auto-dismiss)
-   ══════════════════════════════════════════════════════════════════ */
-@keyframes cs-fade-out {
-  from { opacity: 1; transform: translateY(0); max-height: 300px; }
-  to   { opacity: 0; transform: translateY(8px); max-height: 0; padding: 0; margin: 0; }
-}
-
-.cs-card--fading {
-  animation: cs-fade-out 0.7s cubic-bezier(0.4, 0, 1, 1) both;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   My Rides — sectioned layout
-   ══════════════════════════════════════════════════════════════════ */
-.cs-my-rides {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-  width: 100%;
-}
-
-.cs-section {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.cs-section-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-/* Figma: Roboto Regular 22px, #1e1e1e, line-height 28px, tracking 0 */
-.cs-section-title {
-  flex: 1;
-  font-family: 'Roboto', sans-serif;
-  font-size: 22px;
-  font-weight: 400;
-  line-height: 28px;
-  letter-spacing: 0px;
-  color: #1e1e1e;
   margin: 0;
 }
 
-/* Figma: Roboto Medium 16px, #ff6038, tracking 0.15px */
-.cs-section-see-all {
+/* Actions */
+.cs-ride-actions {
   display: flex;
-  align-items: center;
-  gap: 2px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 24px;
-  letter-spacing: 0.15px;
-  color: #ff6038;
-  white-space: nowrap;
-  flex-shrink: 0;
-  padding: 0;
-}
-
-.cs-section-see-all svg {
-  display: block;
-  flex-shrink: 0;
-}
-
-/* Horizontal scroll container */
-.cs-cards-h {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  padding-bottom: 4px;
-}
-
-.cs-cards-h::-webkit-scrollbar {
-  display: none;
-}
-
-/* Figma: cards 320px wide */
-.cs-card-h {
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 12px 16px;
-  display: flex;
-  flex-direction: column;
   gap: 12px;
-  flex-shrink: 0;
-  width: 320px;
 }
-
-/* More Info button (in My Rides cards): Figma bg #f5f5f5, text #e85733, Roboto SemiBold 16px */
-.cs-moreinfo-btn {
-  width: 100%;
-  background: #f5f5f5;
-  border: none;
+.cs-btn {
+  flex: 1;
+  height: 48px;
   border-radius: 8px;
   padding: 12px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: 'Roboto', sans-serif;
   font-size: 16px;
   font-weight: 600;
   line-height: 24px;
   letter-spacing: 0.15px;
-  color: #e85733;
-  white-space: nowrap;
+  border: none;
+  transition: background 0.15s ease, opacity 0.15s;
 }
+.cs-btn-primary {
+  background: #ff6038;
+  color: #f5f5f5;
+}
+.cs-btn-primary:hover:not(.accepted) { background: #ef5a34; }
+.cs-btn-primary.accepted {
+  background: #ccd3d3;
+  color: #5c6666;
+  cursor: not-allowed;
+}
+.cs-btn-secondary {
+  background: transparent;
+  border: 1px solid rgba(120, 120, 120, 0.2);
+  color: #e85733;
+}
+.cs-btn-secondary:hover { background: rgba(232, 87, 51, 0.04); }
 
-.cs-empty-h {
+/* Accept toast */
+.cs-accept-toast {
+  position: absolute;
+  bottom: 100px;
+  left: 16px;
+  right: 16px;
+  background: #2e3b3b;
+  color: #ffffff;
+  padding: 14px 16px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 30;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+  animation: cs-toast-in 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes cs-toast-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+.cs-toast-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ff6038;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.cs-toast-title {
   font-family: 'Inter', sans-serif;
   font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+.cs-toast-sub {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
   font-weight: 400;
-  color: #9ca3af;
-  padding: 24px 0;
-  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.72);
+  margin: 2px 0 0;
 }

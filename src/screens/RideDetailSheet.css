@@ -223,6 +223,20 @@
   display: block;
 }
 
+/* New SVG icon-slot wrapper used in route info rows */
+.rds-info-icon-slot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f1f3f4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.rds-info-icon-slot.rds-info-icon-pickup  { background: rgba(255, 96, 56, 0.12); }
+.rds-info-icon-slot.rds-info-icon-dropoff { background: rgba(46, 59, 59, 0.10); }
+
 .rds-info-text {
   flex: 1;
   font-family: 'Inter', sans-serif;
@@ -271,26 +285,31 @@
 
 /* ── Chat button (shown when accepted) ─────────────────────────── */
 .rds-chat-btn {
-  background: #f5f5f5;
-  border: 1px solid #e8f0f0;
+  background: #ffffff;
+  border: 1px solid rgba(232, 87, 51, 0.4);
   border-radius: 8px;
-  height: 48px;
+  height: 56px;          /* match .rds-start-btn exactly */
+  padding: 0;
   width: 100%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   font-family: 'Inter', sans-serif;
   font-size: 16px;
-  font-weight: 400;
-  color: #1e1e1e;
+  font-weight: 600;
+  color: #e85733;
+  flex-shrink: 0;
 }
+.rds-chat-btn:active { background: rgba(232, 87, 51, 0.06); }
 
-/* ── Start Ride button (post-accept state) ──────────────────────── */
+/* ── Start Ride button (post-accept state) — primary orange ───── */
 .rds-start-btn {
-  background: #2e3b3b;
+  background: #ff6038;
   border-radius: 8px;
-  height: 48px;
+  height: 56px;          /* match .rds-chat-btn exactly */
+  padding: 0;
   width: 100%;
   border: none;
   cursor: pointer;
@@ -299,7 +318,10 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
+  transition: background 0.15s ease;
 }
+.rds-start-btn:hover  { background: #ef5a34; }
+.rds-start-btn:active { background: #e85733; }
 
 .rds-accepted-check {
   width: 16px;

@@ -1,35 +1,33 @@
 import { useApp } from '../context/AppContext';
+import { useT } from '../i18n';
+import { CarIcon, WalletIcon, UsersIcon } from './Icons';
 import './BottomNav.css';
 
-// Fresh Figma assets — sourced from node 173:5665 (Community screen, current session)
-const HOME_ICON   = 'https://www.figma.com/api/mcp/asset/69852c79-c351-412a-a47f-27aa166180ca';
-const WALLET_ICON = 'https://www.figma.com/api/mcp/asset/77251ffb-f414-470a-972f-9966c646cf6c';
-const USERS_ICON  = 'https://www.figma.com/api/mcp/asset/5c342526-246e-4ca7-8135-d931d29fab40';
-
 const TABS = [
-  { id: 'home',      icon: HOME_ICON,   label: 'Home',      cls: 'nav-home-btn' },
-  { id: 'wallet',    icon: WALLET_ICON, label: 'Wallet',    cls: 'nav-icon-btn' },
-  { id: 'community', icon: USERS_ICON,  label: 'Community', cls: 'nav-icon-btn' },
+  { id: 'home',      Icon: CarIcon,    key: 'nav.ride'      },
+  { id: 'wallet',    Icon: WalletIcon, key: 'nav.wallet'    },
+  { id: 'community', Icon: UsersIcon,  key: 'nav.community' },
 ];
 
 export default function BottomNav() {
   const { activeTab, setActiveTab } = useApp();
+  const t = useT();
 
   return (
     <nav className="bottom-nav-blur">
       <div className="bottom-nav-wrapper">
         <div className="bottom-nav-pill">
-          {TABS.map(({ id, icon, label, cls }) => {
+          {TABS.map(({ id, Icon, key }) => {
             const active = activeTab === id;
+            const label = t(key);
             return (
               <button
                 key={id}
-                className={`${cls}${active ? ' active' : ''}`}
+                className={`nav-btn${active ? ' active' : ''}`}
                 onClick={() => setActiveTab(id)}
                 aria-label={label}
               >
-                <img src={icon} alt="" className="nav-btn-icon" />
-                {/* Always rendered — CSS animates opacity + width so it slides in smoothly */}
+                <Icon size={24} className="nav-btn-icon" />
                 <span className="nav-label">{label}</span>
               </button>
             );

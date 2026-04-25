@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 103 125" fill="#2e3b3b">
+  <!-- Pointed roof -->
+  <path d="M51.5 49 L40 64 L63 64 Z"/>
+  <!-- Tower body — slightly tapered (wider at bottom) -->
+  <path d="M40 64 L63 64 L70 124 L33 124 Z"/>
+  <!-- Door cutout at the front-base -->
+  <rect x="46" y="103" width="11" height="21" fill="#e0eaeb"/>
+</svg>

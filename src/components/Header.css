@@ -1,22 +1,38 @@
-/* ── Header ── matches Figma 167:6401 */
+/* ══════════════════════════════════════════════════════════════════
+   Header — Figma nodes 82:20266 / 83:20703 (header container 83:20856)
+   Outer: bg #e0eaeb on Ride tab (teal hero), plain on others, flex-col gap 8px
+   Inner header row: px-16 py-12 (contains the user pill)
+   Windmill absolutely positioned, bleeds out of the header bottom edge.
+   Tagline row: px-16 only, below the pill.
+   ══════════════════════════════════════════════════════════════════ */
 .header-pill-wrapper {
   flex-shrink: 0;
-  padding: 12px 16px;
-  background: #f5f5f5;
+  padding: 12px 16px 0;
+  background: #e0eaeb;
+  position: relative;
+  overflow: visible;   /* let the windmill bleed out the bottom on every tab */
+  padding-bottom: 0;
+  /* No z-index: cards drawn after the header naturally cover any bleed. */
 }
 
+/* Wallet tab — white hero so the credit-balance card fuses seamlessly */
+.header-pill-wrapper.tab-wallet {
+  background: #ffffff;
+}
+
+/* ── Header row — no pill bg, just avatar + text + bell on the hero ── */
 .header-pill {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #ffffff;
-  border: 0.6px solid #e8f0f0;
-  border-radius: 122px;
+  background: transparent;
+  border: none;
   padding: 8px;
   gap: 8px;
+  position: relative;
+  z-index: 3;           /* above the windmill so content always sits on top */
 }
 
-/* Left side ─ avatar + name */
 .header-left {
   display: flex;
   align-items: center;
@@ -42,12 +58,6 @@
   justify-content: center;
 }
 
-.header-avatar-img {
-  width: 24px;
-  height: 24px;
-  display: block;
-}
-
 .header-name-block {
   display: flex;
   flex-direction: column;
@@ -63,10 +73,7 @@
   color: #000000;
   white-space: nowrap;
 }
-
-.header-name-bold {
-  font-weight: 700;
-}
+.header-name-bold { font-weight: 700; }
 
 .header-role {
   font-family: 'Roboto', sans-serif;
@@ -77,7 +84,6 @@
   color: #000000;
 }
 
-/* Right side ─ bell button */
 .header-bell {
   flex-shrink: 0;
   position: relative;
@@ -94,13 +100,6 @@
   transition: background 0.15s;
 }
 
-
-.header-bell-img {
-  width: 24px;
-  height: 24px;
-  display: block;
-}
-
 .header-badge {
   position: absolute;
   top: 10px;
@@ -110,4 +109,43 @@
   background: #ff6038;
   border-radius: 50%;
   border: 1.5px solid #ffffff;
+}
+
+/* ── Hero tagline ────────────────────────────────────────────── */
+.header-tagline {
+  margin: 8px 0 12px;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 23px;
+  color: #000000;
+  position: relative;
+  z-index: 3;
+  max-width: 249px;
+}
+
+/* Reserve room for the windmill bleed on non-home tabs (no tagline there) */
+.header-spacer {
+  height: 28px;
+  flex-shrink: 0;
+}
+/* Community pulls the next section up so the windmill lands on the Friends card */
+.header-pill-wrapper.tab-community .header-spacer {
+  height: 8px;
+}
+
+/* ── Windmill (Ride tab only) ────────────────────────────────── */
+/* Figma: inset-[10.08%_17.72%_-14.79%_56.73%] of header container + -scale-x-100
+   Header height ≈ 107px → top=11, bottom=-16 (bleeds)
+   Header width  = 401px → right=71, left=227 → width=103 */
+.header-windmill {
+  position: absolute;
+  top: 11px;
+  right: 71px;
+  width: 103px;
+  height: 125px;
+  z-index: 1;
+  pointer-events: none;
+  transform: scaleX(-1);   /* matches Figma -scale-x-100 */
 }

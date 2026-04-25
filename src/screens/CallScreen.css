@@ -1,0 +1,186 @@
+/* ══════════════════════════════════════════════════════════════════
+   CallScreen — full-screen incoming/outgoing call UI.
+   Sits above everything (z-index 800) and steals all input.
+   ══════════════════════════════════════════════════════════════════ */
+
+.cs-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 800;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 56px 24px 36px;
+  overflow: hidden;
+  animation: cs-rise 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes cs-rise {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0);    }
+}
+
+/* Brand-tinted backdrop (dark teal → near-black gradient) */
+.cs-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255, 96, 56, 0.22) 0%, transparent 55%),
+    linear-gradient(180deg, #1f2828 0%, #0f1717 100%);
+}
+
+/* ── Top status row ────────────────────────────────────────── */
+.cs-top {
+  text-align: center;
+  margin-bottom: 36px;
+  flex-shrink: 0;
+}
+.cs-status {
+  margin: 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.4px;
+}
+.cs-hotline {
+  margin: 4px 0 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* ── Avatar + identity ────────────────────────────────────── */
+.cs-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.cs-avatar {
+  position: relative;
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  background: #ff6038;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 16px 48px rgba(255, 96, 56, 0.35);
+}
+.cs-avatar-mark {
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 56px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+/* Pulse rings (only animate during the "calling" phase) */
+.cs-avatar-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 96, 56, 0.5);
+  opacity: 0;
+}
+.cs-avatar.calling .cs-avatar-pulse        { animation: cs-pulse 1.6s ease-out infinite; }
+.cs-avatar.calling .cs-avatar-pulse.delay  { animation: cs-pulse 1.6s ease-out infinite 0.8s; }
+@keyframes cs-pulse {
+  0%   { transform: scale(1);    opacity: 0.7; }
+  100% { transform: scale(1.55); opacity: 0;   }
+}
+
+.cs-name {
+  margin: 4px 0 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.15px;
+  color: #ffffff;
+}
+.cs-sub {
+  margin: 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.65);
+  max-width: 260px;
+}
+
+/* ── Controls row ──────────────────────────────────────────── */
+.cs-controls {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  width: 100%;
+  max-width: 360px;
+  margin-bottom: 36px;
+}
+.cs-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.cs-control-face {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+}
+.cs-control:hover .cs-control-face { background: rgba(255, 255, 255, 0.18); }
+.cs-control.on    .cs-control-face { background: #ffffff; }
+.cs-control-lbl {
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.3px;
+}
+
+/* ── End call ──────────────────────────────────────────────── */
+.cs-end-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.cs-end-btn {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #e63946;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 32px rgba(230, 57, 70, 0.45);
+  transition: background 0.15s ease, transform 0.12s ease;
+}
+.cs-end-btn:hover  { background: #d12f3c; }
+.cs-end-btn:active { transform: scale(0.94); }
+
+.cs-end-lbl {
+  margin: 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+}

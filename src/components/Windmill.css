@@ -1,0 +1,44 @@
+/* ══════════════════════════════════════════════════════════════════
+   Windmill — two-layer composite. Blades (103×108) rotate.
+   Tower (103×125) stays static, in front of the blade hub.
+   Container is the native composite size, 103×125, so layers stack.
+   ══════════════════════════════════════════════════════════════════ */
+
+.windmill {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.windmill-blades,
+.windmill-tower {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  display: block;
+}
+
+/* Blades layer is 108 / 125 ≈ 86.4% of the composite height */
+.windmill-blades {
+  top: 0;
+  height: 86.4%;
+  /* Hub anchor inside the blades image: 50/103 ≈ 48.5% / 54/108 = 50% */
+  transform-origin: 48.54% 50%;
+  animation: windmill-spin 10s linear infinite;
+}
+
+/* Tower covers the full composite — sits over the blades hub */
+.windmill-tower {
+  top: 0;
+  height: 100%;
+}
+
+@keyframes windmill-spin {
+  from { transform: rotate(0deg);   }
+  to   { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .windmill-blades { animation: none; }
+}

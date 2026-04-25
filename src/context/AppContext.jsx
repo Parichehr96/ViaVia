@@ -25,6 +25,7 @@ export function AppProvider({ children }) {
   const [dismissedRides, setDismissedRides] = useState(new Set());
   const [selectedRide, setSelectedRide] = useState(null);
   const [targetCommunityTab, setTargetCommunityTab] = useState(null); // null | 'all' | 'mine'
+  const [myRidesTab, setMyRidesTab] = useState('driving'); // 'driving' | 'riding' — Ride-page sub-tab
 
   // ── New ride flow state ──────────────────────────────────────────
   const [activeRide, setActiveRide] = useState(null);
@@ -34,8 +35,12 @@ export function AppProvider({ children }) {
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState([]);
   const [statusToast, setStatusToast] = useState(null); // null | { message, icon }
+  const [callOpen, setCallOpen] = useState(false);
 
-  function openRideFlow(step = 'pickup') {
+  function openCall()  { setCallOpen(true); }
+  function closeCall() { setCallOpen(false); }
+
+  function openRideFlow(step = 'search') {
     setRideFlowStep(step);
     setRideFlowOpen(true);
   }
@@ -185,6 +190,7 @@ export function AppProvider({ children }) {
       rideFlowResult, setRideFlowResult, clearRideFlowResult,
       rideToast, showRideToast, clearRideToast,
       targetCommunityTab, setTargetCommunityTab,
+      myRidesTab, setMyRidesTab,
       acceptedRides, acceptRide,
       acceptToast, showAcceptToast, clearAcceptToast,
       dismissedRides, dismissRide,
@@ -199,6 +205,7 @@ export function AppProvider({ children }) {
       chatOpen, openChat, closeChat,
       chatMessages, sendChatMessage,
       statusToast, clearStatusToast,
+      callOpen, openCall, closeCall,
     }}>
       {children}
     </AppContext.Provider>

@@ -1,8 +1,8 @@
 /* ══════════════════════════════════════════════════════════════════
-   RideRequestScreen — Figma 207:5213 / 170:8343 / 148:3660
+   RideRequestScreen — Bolt-style flow, ViaVia brand
    ══════════════════════════════════════════════════════════════════ */
 
-/* ── Full-screen overlay ────────────────────────────────────────── */
+/* ── Full-screen overlay (slides up from bottom) ───────────────── */
 .rrs-overlay {
   position: absolute;
   inset: 0;
@@ -24,28 +24,454 @@
               visibility 0s linear 0s;
 }
 
-/* ── Step-change: bottom panel slides up fresh on each step ─────── */
-@keyframes rrs-panel-enter {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
+/* ══════════════════════════════════════════════════════════════════
+   Shared: close / back buttons, spinner, spinner
+   ══════════════════════════════════════════════════════════════════ */
+.rrs-close-btn {
+  background: #ffffff;
+  border: 0.6px solid #e8f0f0;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: background 0.15s;
 }
+.rrs-close-btn:active { background: #f5f5f5; }
 
-/* ── Confirmed screen fades in ──────────────────────────────────── */
-@keyframes rrs-confirmed-enter {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+.rrs-header-spacer { width: 40px; flex-shrink: 0; }
 
-/* ── User live-location dot ─────────────────────────────────────── */
-@keyframes rrs-pulse {
-  0%   { transform: scale(1);   opacity: 0.75; }
-  100% { transform: scale(2.8); opacity: 0;    }
-}
-.rrs-user-dot {
-  position: relative;
+/* Spinner for confirm-ride submit */
+.rrs-spinner {
   width: 20px;
   height: 20px;
+  border: 2.5px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: rrs-spin 0.7s linear infinite;
 }
+@keyframes rrs-spin { to { transform: rotate(360deg); } }
+
+/* Shared dark confirm button */
+.rrs-confirm-btn {
+  background: #2e3b3b;
+  border-radius: 8px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.rrs-confirm-btn:active:not(.disabled):not(:disabled) { transform: scale(0.98); }
+.rrs-confirm-btn.disabled, .rrs-confirm-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.rrs-confirm-btn-text {
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+  color: #f5f5f5;
+  letter-spacing: 0.1px;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   SEARCH STEP — pickup/dropoff picker with quick picks & recents
+   ══════════════════════════════════════════════════════════════════ */
+.rrs-search-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+  background: #f5f5f5;
+}
+
+.rrs-search-header {
+  flex-shrink: 0;
+  padding: 16px 20px 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.rrs-search-title {
+  flex: 1;
+  text-align: center;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e1e1e;
+  letter-spacing: 0.1px;
+  margin: 0;
+}
+
+/* ── Pickup / Dropoff card ───────────────────────────────────── */
+.rrs-search-card {
+  flex-shrink: 0;
+  margin: 12px 20px 0;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 8px 8px 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+.rrs-search-fields {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.rrs-field-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 4px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  width: 100%;
+}
+.rrs-field-icon { flex-shrink: 0; }
+.rrs-field-value {
+  flex: 1;
+  min-width: 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: #1e1e1e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rrs-field-value.rrs-field-placeholder { color: #9ca3af; }
+
+.rrs-field-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: #1e1e1e;
+}
+.rrs-field-input::placeholder { color: #9ca3af; }
+
+.rrs-field-action {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+}
+.rrs-field-action.rrs-field-map {
+  background: #f7e3de;
+}
+.rrs-field-action.rrs-field-map:active { background: #f0d3cb; }
+
+.rrs-field-divider {
+  height: 1px;
+  background: #e8f0f0;
+  margin-left: 34px;
+}
+
+/* Swap arrows button */
+.rrs-swap-btn {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #f5f5f5;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  transition: background 0.15s;
+}
+.rrs-swap-btn:active:not(.disabled) { background: #ebebeb; }
+.rrs-swap-btn.disabled, .rrs-swap-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+
+/* ── Quick-pick chips ────────────────────────────────────────── */
+.rrs-quickpick-row {
+  flex-shrink: 0;
+  display: flex;
+  gap: 8px;
+  padding: 12px 20px 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.rrs-quickpick-row::-webkit-scrollbar { display: none; }
+
+.rrs-chip {
+  flex-shrink: 0;
+  background: #ffffff;
+  border: none;
+  border-radius: 100px;
+  padding: 10px 22px;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #1e1e1e;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: background 0.15s, color 0.15s;
+}
+.rrs-chip.active {
+  background: #ff6038;
+  color: #ffffff;
+}
+.rrs-chip:active:not(.active) { background: #f0f0f0; }
+
+/* ── Recent locations list ───────────────────────────────────── */
+.rrs-recents {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 20px 16px;
+  scrollbar-width: none;
+  min-height: 0;
+}
+.rrs-recents::-webkit-scrollbar { display: none; }
+
+.rrs-recents-empty {
+  margin: 24px 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 14px;
+  color: #9ca3af;
+  text-align: center;
+}
+
+.rrs-recent-row {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+.rrs-recent-row:active { background: rgba(0, 0, 0, 0.02); }
+.rrs-recent-ico { flex-shrink: 0; }
+.rrs-recent-text { flex: 1; min-width: 0; }
+.rrs-recent-name {
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #1e1e1e;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rrs-recent-addr {
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: #727272;
+  margin: 2px 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rrs-recent-dist {
+  flex-shrink: 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: #727272;
+}
+.rrs-recent-divider {
+  position: absolute;
+  left: 32px;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: #e8f0f0;
+}
+
+/* ── Search-step footer (Confirm Destination) ────────────────── */
+.rrs-search-footer {
+  flex-shrink: 0;
+  padding: 12px 20px 20px;
+  background: #f5f5f5;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   MAP-SELECT STEP — full-bleed Leaflet for pin placement
+   ══════════════════════════════════════════════════════════════════ */
+.rrs-map-step {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.rrs-map-container {
+  position: absolute;
+  inset: 0;
+}
+
+.rrs-map-header {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.rrs-map-header-title {
+  flex: 1;
+  text-align: center;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e1e1e;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 10px 14px;
+  border-radius: 100px;
+  border: 0.6px solid #e8f0f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rrs-locate-fab {
+  position: absolute;
+  right: 16px;
+  bottom: 188px;        /* sits above the bottom confirm card */
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  z-index: 6;
+}
+.rrs-locate-fab:active { background: #f5f5f5; }
+
+/* ── Center crosshair — shows the exact tap target ─────────── */
+.rrs-map-crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 28px;
+  height: 28px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 5;
+}
+.rrs-map-crosshair-h,
+.rrs-map-crosshair-v {
+  position: absolute;
+  background: rgba(46, 59, 59, 0.55);
+}
+.rrs-map-crosshair-h {
+  top: 50%; left: 0; right: 0; height: 1.5px;
+  transform: translateY(-50%);
+}
+.rrs-map-crosshair-v {
+  left: 50%; top: 0; bottom: 0; width: 1.5px;
+  transform: translateX(-50%);
+}
+.rrs-map-crosshair-dot {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #ff6038;
+  border: 1.5px solid #ffffff;
+  transform: translate(-50%, -50%);
+}
+
+/* ── Bottom confirm card on the map step ───────────────────── */
+.rrs-map-confirm {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  z-index: 7;
+}
+.rrs-map-confirm-label-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rrs-map-confirm-label {
+  flex: 1;
+  min-width: 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: #1e1e1e;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.rrs-map-confirm-btn {
+  width: 100%;
+  height: 48px;
+}
+
+.rrs-geocoding {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.96);
+  padding: 8px 14px;
+  border-radius: 100px;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 13px;
+  color: #555;
+  z-index: 7;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* ── Live user-location blue dot (Leaflet divIcon children) ── */
+.rrs-user-dot { position: relative; width: 20px; height: 20px; }
 .rrs-user-dot-ring {
   width: 20px;
   height: 20px;
@@ -66,407 +492,210 @@
   top: 4px;
   left: 4px;
 }
-
-/* ── Shared header pill ─────────────────────────────────────────── */
-/* Figma: bg-white border-0.6px #e8f0f0 rounded-122px p-8px */
-.rrs-header {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  padding: 8px 16px;
-}
-/* When used as absolute overlay above map */
-.rrs-header-abs {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 10;
-}
-.rrs-header-pill {
-  background: #ffffff;
-  border: 0.6px solid #e8f0f0;
-  border-radius: 122px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px;
-  flex: 1;
-  gap: 8px;
-}
-.rrs-header-left {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-/* Back button */
-.rrs-back-btn {
-  background: #f5f5f5;
-  border: 1.2px solid #ffffff;
-  border-radius: 122px;
-  padding: 7px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-/* .rrs-back-ico removed — now using Lucide ChevronLeft inline */
-/* Bell button */
-.rrs-bell-btn {
-  background: #f5f5f5;
-  border: 1.2px solid #ffffff;
-  border-radius: 122px;
-  padding: 7px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-.rrs-bell-ico {
-  width: 18px;
-  height: 18px;
-  display: block;
+@keyframes rrs-pulse {
+  0%   { transform: scale(1);   opacity: 0.75; }
+  100% { transform: scale(2.8); opacity: 0;    }
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   MAP STEP (pickup / dropoff)
+   CONFIRM STEP — map + ride card + payment + CTAs
    ══════════════════════════════════════════════════════════════════ */
-.rrs-map-step {
+.rrs-confirm-step {
   flex: 1;
   position: relative;
   overflow: hidden;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Leaflet map fills the background */
-.rrs-map-container {
+.rrs-confirm-topbar {
   position: absolute;
-  inset: 0;
+  top: 16px;
+  left: 16px;
+  z-index: 10;
 }
 
-/* ── Bottom floating panel ──────────────────────────────────────── */
-/* Figma: p-[20px] gap-[12px] */
-/* Animates in on every step change (key prop causes remount) */
-.rrs-bottom-float {
+.rrs-confirm-bottom {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 0 20px 20px;
+  z-index: 5;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  z-index: 5;
-  animation: rrs-panel-enter 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+  gap: 10px;
+  animation: rrs-confirm-slide 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes rrs-confirm-slide {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0);    }
 }
 
-/* Crosshair row — aligned to the right */
-.rrs-crosshair-row {
-  display: flex;
-  justify-content: flex-end;
-}
-/* Figma: bg-white, rounded-40px, p-16px */
-.rrs-crosshair-btn {
+/* ── Ride option card (single) ───────────────────────────────── */
+.rrs-ride-card {
   background: #ffffff;
-  border-radius: 40px;
-  padding: 16px;
+  border-radius: 16px;
+  padding: 14px 16px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-  border: none;
-}
-.rrs-crosshair-ico {
-  width: 24px;
-  height: 24px;
-  display: block;
-}
-
-/* Location input card */
-/* Figma: backdrop-blur-16px, bg-white, rounded-20px, p-16px, gap-8px */
-.rrs-location-card {
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: 20px;
-  padding: 16px;
-  display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.10);
 }
-/* Icon container: bg-#f5f5f5 rounded-12px p-12px */
-.rrs-loc-icon-wrap {
-  background: #f5f5f5;
-  border-radius: 12px;
-  padding: 12px;
+.rrs-ride-header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  gap: 6px;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.3;
+  min-width: 0;
 }
-.rrs-loc-icon {
-  width: 24px;
-  height: 24px;
-  display: block;
+.rrs-ride-from {
+  color: #ff6038;
+  font-weight: 600;
+  max-width: 45%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-/* Input column: flex-col gap-4px */
-.rrs-input-col {
+.rrs-ride-arrow { color: #727272; flex-shrink: 0; }
+.rrs-ride-to {
   flex: 1;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-/* Label: Roboto Regular 14px, #000, tracking 0.1px, line-height 20px */
-.rrs-input-label {
-  font-family: 'Roboto', sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 20px;
-  letter-spacing: 0.1px;
-  color: #000000;
-}
-/* Value: Inter Regular 16px, #1e1e1e, line-height 1 */
-.rrs-input-value {
-  font-family: 'Inter', sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 1;
   color: #1e1e1e;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.rrs-input-value.rrs-placeholder {
-  color: #9ca3af;
-}
-
-/* Quick-pick buttons row */
-/* Figma: gap-12px */
-.rrs-quickpicks {
+.rrs-ride-meta {
   display: flex;
+  align-items: baseline;
+  justify-content: space-between;
   gap: 12px;
-  align-items: center;
 }
-/* Each button: bg-white, rounded-12px, px-20px py-12px, gap-4px */
-.rrs-pick-btn {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 12px 20px;
+.rrs-ride-left {
   display: flex;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-  border: none;
-  flex-shrink: 0;
-  transition: background 0.15s;
+  align-items: baseline;
+  gap: 6px;
 }
-/* Active quick pick: bg-#f7e3de */
-.rrs-pick-btn.active {
-  background: #f7e3de;
-}
-.rrs-pick-icon {
-  width: 24px;
-  height: 24px;
-  display: block;
-  flex-shrink: 0;
-}
-/* Label: Roboto Regular 16px, #ff6038, tracking 0.5px */
-.rrs-pick-label {
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 24px;
-  letter-spacing: 0.5px;
-  color: #ff6038;
-  white-space: nowrap;
-}
-
-/* Confirm button: bg-#2e3b3b, h-48px, rounded-8px */
-.rrs-confirm-btn {
-  background: #2e3b3b;
-  border-radius: 8px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  cursor: pointer;
-  border: none;
-  transition: opacity 0.15s;
-}
-.rrs-confirm-btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-/* Text: Inter Regular 16px, #f5f5f5 */
-.rrs-confirm-btn-text {
-  font-family: 'Inter', sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 1;
-  color: #f5f5f5;
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   CONFIRMED STEP (148:3660)
-   ══════════════════════════════════════════════════════════════════ */
-.rrs-confirmed-step {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background: #f5f5f5;
-  overflow: hidden;
-  min-height: 0;
-  animation: rrs-confirmed-enter 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-/* Header for confirmed step (not absolute — it's in flow) */
-.rrs-confirmed-header {
-  flex-shrink: 0;
-}
-
-/* Scrollable body */
-.rrs-confirmed-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-  scrollbar-width: none;
-}
-.rrs-confirmed-body::-webkit-scrollbar { display: none; }
-
-/* Title row: flex center, gap-8px */
-.rrs-confirmed-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-.rrs-check-icon {
-  width: 32px;
-  height: 32px;
-  display: block;
-  flex-shrink: 0;
-}
-/* Title: Roboto Medium 22px, #232d2d, tracking 0 */
-.rrs-confirmed-title {
-  font-family: 'Roboto', sans-serif;
+.rrs-ride-eta {
+  font-family: 'Inter', 'Roboto', sans-serif;
   font-size: 22px;
-  font-weight: 500;
-  line-height: 28px;
-  letter-spacing: 0px;
-  color: #232d2d;
-  white-space: nowrap;
-}
-
-/* Request card: bg-white, rounded-20px, p-16px, gap-20px */
-.rrs-request-card {
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-/* Mini map: h-222px, rounded-10px, overflow-hidden */
-.rrs-mini-map {
-  width: 100%;
-  height: 222px;
-  border-radius: 10px;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-.rrs-mini-map .leaflet-container {
-  border-radius: 10px;
-}
-
-/* Info list: gap-16px */
-.rrs-info-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-/* Each row: gap-8px, items-center */
-.rrs-info-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.rrs-info-icon {
-  width: 18px;
-  height: 18px;
-  display: block;
-  flex-shrink: 0;
-  object-fit: contain;
-}
-/* Text: Inter Regular 16px, #1e1e1e, line-height 1.4 */
-.rrs-info-text {
-  flex: 1;
-  min-width: 0;
-  font-family: 'Inter', sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 1.4;
+  font-weight: 600;
   color: #1e1e1e;
 }
-.rrs-info-bold {
-  font-weight: 600;
-}
-
-/* Pickup note: Inter Regular 14px, #757575 */
-.rrs-pickup-note {
-  font-family: 'Inter', sans-serif;
+.rrs-ride-dist {
+  font-family: 'Inter', 'Roboto', sans-serif;
   font-size: 14px;
   font-weight: 400;
-  line-height: 1.4;
-  color: #757575;
+  color: #727272;
+}
+.rrs-ride-price {
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: #1e1e1e;
 }
 
-/* Done button: bg-#ff6038, rounded-8px, full width */
-.rrs-done-btn {
+/* ── Payment card ────────────────────────────────────────────── */
+.rrs-pay-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 4px 16px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.10);
+}
+.rrs-pay-row {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 12px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.rrs-pay-label {
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: #232d2d;
+}
+.rrs-pay-divider {
+  height: 1px;
+  background: #e8f0f0;
+}
+.rrs-radio {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.8px solid #c9c9c9;
+  background: #ffffff;
+  flex-shrink: 0;
+  position: relative;
+  transition: border-color 0.15s;
+}
+.rrs-radio.selected {
+  border-color: #ff6038;
+}
+.rrs-radio.selected::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
   background: #ff6038;
-  border-radius: 8px;
+}
+
+/* ── CTA row: Confirm Ride + schedule clock ──────────────────── */
+.rrs-cta-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.rrs-confirm-ride { flex: 1; }
+
+.rrs-schedule-btn {
+  flex-shrink: 0;
+  width: 48px;
   height: 48px;
+  border-radius: 8px;
+  background: #2e3b3b;
+  border: none;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  cursor: pointer;
-  border: none;
-  transition: opacity 0.15s;
+  transition: opacity 0.15s, transform 0.1s;
 }
-.rrs-done-btn:active { opacity: 0.85; }
-/* Text: Roboto SemiBold 16px, #f5f5f5, tracking 0.15px */
-.rrs-done-btn-text {
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 24px;
-  letter-spacing: 0.15px;
-  color: #f5f5f5;
+.rrs-schedule-btn:active { transform: scale(0.96); }
+.rrs-schedule-btn.active {
+  background: #ff6038;          /* highlight when a time is set */
 }
 
-/* Geocoding spinner */
-.rrs-geocoding {
-  position: absolute;
-  bottom: 200px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(255,255,255,0.9);
-  border-radius: 20px;
-  padding: 8px 16px;
-  font-family: 'Inter', sans-serif;
+/* "Scheduled for …" line inside the ride card */
+.rrs-ride-scheduled {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Inter', 'Roboto', sans-serif;
   font-size: 13px;
-  color: #555;
-  z-index: 6;
-  pointer-events: none;
+  font-weight: 500;
+  color: #e85733;
+}
+.rrs-ride-scheduled span { flex: 1; min-width: 0; }
+.rrs-ride-scheduled-edit {
+  background: transparent;
+  border: none;
+  padding: 0 2px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: #e85733;
+  cursor: pointer;
+  text-decoration: underline;
 }

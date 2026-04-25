@@ -1,122 +1,408 @@
-import { ChevronRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { useT, useLocale, LOCALES } from '../i18n';
+import {
+  UserIcon, BellIcon, CarIcon, ClockIcon, StarIcon, HistoryIcon,
+  ShieldIcon, HelpIcon, GlobeIcon, VerifiedIcon,
+  ChevronLeftIcon, ChevronRightIcon, CloseIcon, CheckIcon,
+} from './Icons';
 import './ProfilePanel.css';
 
-// ── Figma asset URLs (node 211:6118 — refreshed Apr 16 2026) ─────────────────
-const AVATAR_ICO   = 'https://www.figma.com/api/mcp/asset/f9c95422-67b2-45ff-ac70-0b5fc7dd1e67';
-const CLOSE_ICO    = 'https://www.figma.com/api/mcp/asset/1eef8c6e-dedb-4569-bcda-8cc55d73cf47';
-// Note: Figma chevron asset is 5×10px content inside 24px slot — renders as filled triangle
-// at full size; using Lucide ChevronRight matches the thin-arrow style in the Figma screenshot
-// Menu icons (leading)
-const ICON_PERSON  = 'https://www.figma.com/api/mcp/asset/ddb2057b-8de1-4975-aa20-802878e62a70';
-const ICON_VEHICLE = 'https://www.figma.com/api/mcp/asset/af624d15-f420-45f7-8cc7-f9c6e8f935b5';
-const ICON_AVAIL   = 'https://www.figma.com/api/mcp/asset/e4503ceb-e3a3-4244-86bb-9c53ce4c551a';
-const ICON_FAV     = 'https://www.figma.com/api/mcp/asset/b639a727-9f27-4a44-aa1c-78c36d137f5f';
-const ICON_HISTORY = 'https://www.figma.com/api/mcp/asset/37749c53-2dc7-4124-9e79-9f78b3105bcd';
+/* ══════════════════════════════════════════════════════════════════
+   ProfilePanel — pixel-perfect main view + nested sub-pages.
+   Sub-pages slide in over the main view; back button returns.
+   ══════════════════════════════════════════════════════════════════ */
 
-// Figma: h-[40px], gap-[12px], items-center, py-[8px]
-// Icon items have a 24×24 leading slot; icon-less items start flush with the label
-function MenuItem({ icon, label }) {
+const PAGES = {
+  PERSONAL:    'personal',
+  VEHICLE:     'vehicle',
+  AVAILABILITY:'availability',
+  FAVORITES:   'favorites',
+  HISTORY:     'history',
+  PREFERENCES: 'preferences',
+  LANGUAGE:    'language',
+  PRIVACY:     'privacy',
+  HELP:        'help',
+};
+
+// ── Generic menu row ─────────────────────────────────────────────
+function MenuItem({ icon: Icon, label, onClick, withChevron = true, value, danger }) {
   return (
-    <button className="pp-item">
-      {icon && (
+    <button className={`pp-item${danger ? ' danger' : ''}`} onClick={onClick}>
+      {Icon && (
         <span className="pp-item-icon-slot">
-          <img src={icon} alt="" className="pp-item-icon" />
+          <Icon size={22} style={{ color: danger ? '#e85733' : '#1a1a1a' }} />
         </span>
       )}
       <span className="pp-item-label">{label}</span>
-      {/* Figma chevron: 5×10px content inside 24px slot — Lucide matches the thin style */}
-      <ChevronRight size={14} strokeWidth={1.75} color="rgba(0,0,0,0.35)" style={{ flexShrink: 0 }} />
+      {value && <span className="pp-item-value">{value}</span>}
+      {withChevron && <ChevronRightIcon size={14} style={{ color: 'rgba(0,0,0,0.4)' }} />}
     </button>
   );
 }
 
+// ── Toggle switch ────────────────────────────────────────────────
+function Toggle({ checked, onChange }) {
+  return (
+    <button
+      className={`pp-toggle${checked ? ' on' : ''}`}
+      onClick={() => onChange?.(!checked)}
+      aria-pressed={checked}
+      aria-label="Toggle"
+      type="button"
+    >
+      <span className="pp-toggle-knob" />
+    </button>
+  );
+}
+
+// ── Sub-page chrome (back button + title) ────────────────────────
+function SubPage({ title, onBack, children }) {
+  return (
+    <div className="pp-subpage">
+      <header className="pp-subheader">
+        <button className="pp-subback" onClick={onBack} aria-label="Back">
+          <ChevronLeftIcon size={20} style={{ color: '#1a1a1a' }} />
+        </button>
+        <h2 className="pp-subtitle">{title}</h2>
+        <span className="pp-subspacer" />
+      </header>
+      <div className="pp-subbody">{children}</div>
+    </div>
+  );
+}
+
+// ── Form row used by sub-pages ───────────────────────────────────
+function FormRow({ label, value, readOnly = true }) {
+  return (
+    <label className="pp-form-row">
+      <span className="pp-form-label">{label}</span>
+      <input className="pp-form-input" defaultValue={value} readOnly={readOnly} />
+    </label>
+  );
+}
+
+// ── Sub-pages ────────────────────────────────────────────────────
+function PersonalInfoPage({ onBack }) {
+  const t = useT();
+  return (
+    <SubPage title={t('profile.personal')} onBack={onBack}>
+      <FormRow label={t('pers.name')}  value="John Doe" />
+      <FormRow label={t('pers.email')} value="john.doe@viavia.app" />
+      <FormRow label={t('pers.phone')} value="+31 6 12 34 56 78" />
+      <FormRow label={t('pers.id')}    value="•••••• 4821" />
+    </SubPage>
+  );
+}
+
+function VehicleInfoPage({ onBack }) {
+  const t = useT();
+  return (
+    <SubPage title={t('profile.vehicle')} onBack={onBack}>
+      <FormRow label={t('veh.make')}  value="Volkswagen" />
+      <FormRow label={t('veh.model')} value="ID.3" />
+      <FormRow label={t('veh.year')}  value="2024" />
+      <FormRow label={t('veh.color')} value="White" />
+      <FormRow label={t('veh.plate')} value="NL-XX-001" />
+      <FormRow label={t('veh.seats')} value="4" />
+    </SubPage>
+  );
+}
+
+function AvailabilityPage({ onBack }) {
+  const t = useT();
+  const days = [
+    { key: 'mon', enabled: true  },
+    { key: 'tue', enabled: true  },
+    { key: 'wed', enabled: false },
+    { key: 'thu', enabled: true  },
+    { key: 'fri', enabled: true  },
+    { key: 'sat', enabled: false },
+    { key: 'sun', enabled: false },
+  ];
+  const [state, setState] = useState(() => Object.fromEntries(days.map(d => [d.key, d.enabled])));
+  return (
+    <SubPage title={t('avail.title')} onBack={onBack}>
+      <p className="pp-sub-help">{t('avail.sub')}</p>
+      <div className="pp-avail-grid">
+        {days.map(d => (
+          <button
+            key={d.key}
+            className={`pp-avail-day${state[d.key] ? ' on' : ''}`}
+            onClick={() => setState(s => ({ ...s, [d.key]: !s[d.key] }))}
+          >
+            {t(`avail.weekday.${d.key}`)}
+          </button>
+        ))}
+      </div>
+      <div className="pp-form-row">
+        <span className="pp-form-label">From</span>
+        <input className="pp-form-input" type="time" defaultValue="08:00" />
+      </div>
+      <div className="pp-form-row">
+        <span className="pp-form-label">To</span>
+        <input className="pp-form-input" type="time" defaultValue="18:00" />
+      </div>
+    </SubPage>
+  );
+}
+
+function FavoritesPage({ onBack }) {
+  const t = useT();
+  const places = [
+    { name: 'Home',     addr: 'Jordaan, Amsterdam' },
+    { name: 'Work',     addr: 'Zuidas, Amsterdam' },
+    { name: 'Hospital', addr: 'AMC Amsterdam'     },
+  ];
+  return (
+    <SubPage title={t('profile.favorites')} onBack={onBack}>
+      <ul className="pp-list">
+        {places.map(p => (
+          <li key={p.name}>
+            <div className="pp-row">
+              <StarIcon size={22} style={{ color: '#ff6038' }} />
+              <div className="pp-row-text">
+                <span className="pp-row-label">{p.name}</span>
+                <span className="pp-row-sub">{p.addr}</span>
+              </div>
+              <ChevronRightIcon size={14} style={{ color: 'rgba(0,0,0,0.4)' }} />
+            </div>
+          </li>
+        ))}
+      </ul>
+      <button className="pp-add-btn">{t('fav.add')}</button>
+    </SubPage>
+  );
+}
+
+function HistoryPage({ onBack }) {
+  const t = useT();
+  const history = [
+    { date: 'Apr 22 2026', from: 'Jordaan',           to: 'Schiphol',        price: '€ 14.20' },
+    { date: 'Apr 18 2026', from: 'Centrum',           to: 'Vondelpark',      price: '€ 4.80'  },
+    { date: 'Apr 12 2026', from: 'Amsterdam Central', to: 'Dam Square',      price: '€ 2.60'  },
+  ];
+  return (
+    <SubPage title={t('profile.history')} onBack={onBack}>
+      {history.length === 0 ? (
+        <p className="pp-sub-help">{t('hist.empty')}</p>
+      ) : (
+        <ul className="pp-list">
+          {history.map((h) => (
+            <li key={h.date}>
+              <div className="pp-row pp-row-history">
+                <HistoryIcon size={22} style={{ color: '#1a1a1a' }} />
+                <div className="pp-row-text">
+                  <span className="pp-row-label">{h.from} → {h.to}</span>
+                  <span className="pp-row-sub">{h.date}</span>
+                </div>
+                <span className="pp-row-price">{h.price}</span>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </SubPage>
+  );
+}
+
+function PreferencesPage({ onBack, onNavigate }) {
+  const t = useT();
+  const { locale } = useLocale();
+  const langName = LOCALES.find(l => l.code === locale)?.native || 'English';
+  const [notif, setNotif] = useState(true);
+  const [units, setUnits] = useState('km');
+  return (
+    <SubPage title={t('profile.preferences')} onBack={onBack}>
+      <ul className="pp-list">
+        <li>
+          <button className="pp-row" onClick={() => onNavigate(PAGES.LANGUAGE)}>
+            <GlobeIcon size={22} style={{ color: '#1a1a1a' }} />
+            <span className="pp-row-label">{t('prefs.language')}</span>
+            <span className="pp-row-value">{langName}</span>
+            <ChevronRightIcon size={14} style={{ color: 'rgba(0,0,0,0.4)' }} />
+          </button>
+        </li>
+        <li>
+          <div className="pp-row">
+            <BellIcon size={22} style={{ color: '#1a1a1a' }} />
+            <span className="pp-row-label">{t('prefs.notifications')}</span>
+            <Toggle checked={notif} onChange={setNotif} />
+          </div>
+        </li>
+        <li>
+          <button
+            className="pp-row"
+            onClick={() => setUnits(u => u === 'km' ? 'mi' : 'km')}
+          >
+            <ClockIcon size={22} style={{ color: '#1a1a1a' }} />
+            <span className="pp-row-label">{t('prefs.distance')}</span>
+            <span className="pp-row-value">{units === 'km' ? 'km' : 'mi'}</span>
+          </button>
+        </li>
+      </ul>
+    </SubPage>
+  );
+}
+
+function LanguagePage({ onBack }) {
+  const t = useT();
+  const { locale, setLocale } = useLocale();
+  return (
+    <SubPage title={t('lang.title')} onBack={onBack}>
+      <p className="pp-sub-help">{t('lang.sub')}</p>
+      <ul className="pp-list">
+        {LOCALES.map(l => (
+          <li key={l.code}>
+            <button className="pp-row" onClick={() => setLocale(l.code)}>
+              <span className="pp-lang-code">{l.code.toUpperCase()}</span>
+              <span className="pp-row-text">
+                <span className="pp-row-label">{l.native}</span>
+                <span className="pp-row-sub">{l.label}</span>
+              </span>
+              {locale === l.code && (
+                <CheckIcon size={20} style={{ color: '#ff6038' }} />
+              )}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </SubPage>
+  );
+}
+
+function PrivacyPage({ onBack }) {
+  const t = useT();
+  return (
+    <SubPage title={t('profile.privacy')} onBack={onBack}>
+      <p className="pp-prose">{t('priv.body')}</p>
+    </SubPage>
+  );
+}
+
+function HelpPage({ onBack }) {
+  const t = useT();
+  return (
+    <SubPage title={t('profile.help')} onBack={onBack}>
+      <h3 className="pp-section-title">{t('help.faq')}</h3>
+      <ul className="pp-list">
+        <li>
+          <div className="pp-row pp-row-faq">
+            <HelpIcon size={20} style={{ color: '#1a1a1a' }} />
+            <span className="pp-row-label">How does ViaVia work?</span>
+          </div>
+        </li>
+        <li>
+          <div className="pp-row pp-row-faq">
+            <HelpIcon size={20} style={{ color: '#1a1a1a' }} />
+            <span className="pp-row-label">How are payments handled?</span>
+          </div>
+        </li>
+        <li>
+          <div className="pp-row pp-row-faq">
+            <HelpIcon size={20} style={{ color: '#1a1a1a' }} />
+            <span className="pp-row-label">Cancellation policy</span>
+          </div>
+        </li>
+      </ul>
+      <h3 className="pp-section-title">{t('help.contact')}</h3>
+      <p className="pp-prose">{t('help.contactBody')}</p>
+    </SubPage>
+  );
+}
+
+// ── Main view ─────────────────────────────────────────────────────
+function MainView({ onClose, onNavigate }) {
+  const t = useT();
+  return (
+    <>
+      <div className="pp-header">
+        <div className="pp-header-inner">
+          <div className="pp-avatar-wrap">
+            <UserIcon size={32} style={{ color: '#1a1a1a' }} />
+          </div>
+          <div className="pp-identity">
+            <p className="pp-name">John Doe</p>
+            <div className="pp-role-row">
+              <span className="pp-role">{t('header.role.driver')}</span>
+              <VerifiedIcon size={14} style={{ color: '#ff6038' }} />
+            </div>
+          </div>
+        </div>
+        <button className="pp-close" onClick={onClose} aria-label="Close">
+          <CloseIcon size={20} style={{ color: '#1a1a1a' }} />
+        </button>
+      </div>
+
+      <div className="pp-body">
+        <div className="pp-stats">
+          <div className="pp-stat">
+            <span className="pp-stat-val">Nov 2026</span>
+            <span className="pp-stat-lbl">{t('profile.stat.joined')}</span>
+          </div>
+          <div className="pp-stat-sep" />
+          <div className="pp-stat">
+            <span className="pp-stat-val">12h 32m</span>
+            <span className="pp-stat-lbl">{t('profile.stat.contrib')}</span>
+          </div>
+          <div className="pp-stat-sep" />
+          <div className="pp-stat">
+            <span className="pp-stat-val">10</span>
+            <span className="pp-stat-lbl">{t('profile.stat.rides')}</span>
+          </div>
+        </div>
+
+        <div className="pp-rule" />
+        <MenuItem icon={UserIcon}    label={t('profile.personal')}     onClick={() => onNavigate(PAGES.PERSONAL)} />
+        <div className="pp-rule" />
+        <MenuItem icon={CarIcon}     label={t('profile.vehicle')}      onClick={() => onNavigate(PAGES.VEHICLE)} />
+        <div className="pp-rule" />
+
+        <div className="pp-group">
+          <MenuItem icon={ClockIcon}   label={t('profile.availability')} onClick={() => onNavigate(PAGES.AVAILABILITY)} />
+          <MenuItem icon={StarIcon}    label={t('profile.favorites')}    onClick={() => onNavigate(PAGES.FAVORITES)} />
+          <MenuItem icon={HistoryIcon} label={t('profile.history')}      onClick={() => onNavigate(PAGES.HISTORY)} />
+        </div>
+        <div className="pp-rule" />
+
+        <MenuItem label={t('profile.preferences')} onClick={() => onNavigate(PAGES.PREFERENCES)} />
+        <MenuItem label={t('profile.privacy')}     onClick={() => onNavigate(PAGES.PRIVACY)} />
+        <MenuItem label={t('profile.help')}        onClick={() => onNavigate(PAGES.HELP)} />
+      </div>
+    </>
+  );
+}
+
+// ── Root ──────────────────────────────────────────────────────────
 export default function ProfilePanel() {
   const { profileOpen, setProfileOpen } = useApp();
+  const [page, setPage] = useState(null);
+
+  // Reset to main view whenever the panel is closed
+  useEffect(() => { if (!profileOpen) setPage(null); }, [profileOpen]);
+
+  const close = () => setProfileOpen(false);
+  const back  = () => setPage(null);
+  // Sub-page → sub-page navigation (used for Preferences → Language)
+  const goPrefsBack = () => setPage(PAGES.PREFERENCES);
 
   return (
     <>
       <div
         className={`pp-overlay${profileOpen ? ' visible' : ''}`}
-        onClick={() => setProfileOpen(false)}
+        onClick={close}
       />
-
       <aside className={`pp-panel${profileOpen ? ' open' : ''}`}>
-
-        {/* ── Header ─────────────────────────────────────────── */}
-        {/* Figma: px-[20px] py-[12px], flex row items-center */}
-        <div className="pp-header">
-          <div className="pp-header-inner">
-            {/* Avatar: rgba(116,116,128,0.08) bg, p-[12px], 32px icon → 56px, rounded-[1222px] */}
-            <div className="pp-avatar-wrap">
-              <img src={AVATAR_ICO} alt="" className="pp-avatar-img" />
-            </div>
-            <div className="pp-identity">
-              {/* Figma: Roboto SemiBold 16px #000 tracking 0.15px */}
-              <p className="pp-name">John Doe</p>
-              {/* Figma: Roboto Regular 12px #333 tracking 0.4px */}
-              <p className="pp-role">Verified Driver</p>
-            </div>
-          </div>
-          {/* Figma: 20×20px close icon */}
-          <button
-            className="pp-close"
-            onClick={() => setProfileOpen(false)}
-            aria-label="Close"
-          >
-            <img src={CLOSE_ICO} alt="" className="pp-close-img" />
-          </button>
-        </div>
-
-        {/* ── Body: stats + menu (single container, gap-[16px] p-[20px]) ── */}
-        {/* Figma node 211:6348: flex-col gap-[16px] p-[20px] */}
-        <div className="pp-body">
-
-          {/* Stats row */}
-          <div className="pp-stats">
-            <div className="pp-stat">
-              <span className="pp-stat-val">Nov 2026</span>
-              <span className="pp-stat-lbl">Joined</span>
-            </div>
-            <div className="pp-stat-sep" />
-            <div className="pp-stat">
-              <span className="pp-stat-val">12h 32m</span>
-              <span className="pp-stat-lbl">Contribution</span>
-            </div>
-            <div className="pp-stat-sep" />
-            <div className="pp-stat">
-              <span className="pp-stat-val">10</span>
-              <span className="pp-stat-lbl">Rides</span>
-            </div>
-          </div>
-
-          {/* Separator: h-px w-[300px] rgba(120,120,120,0.2) */}
-          <div className="pp-rule" />
-
-          {/* Personal Information (own section, separator below) */}
-          <MenuItem icon={ICON_PERSON} label="Personal Information" />
-          <div className="pp-rule" />
-
-          {/* Vehicle Information (own section, separator below) */}
-          <MenuItem icon={ICON_VEHICLE} label="Vehicle Information" />
-          <div className="pp-rule" />
-
-          {/* Grouped section: Availability / Favorite places / Ride History */}
-          {/* Figma node 211:6365: flex-col gap-[16px] — items share the parent 16px gap */}
-          <div className="pp-group">
-            <MenuItem icon={ICON_AVAIL}   label="Availability"    />
-            <MenuItem icon={ICON_FAV}     label="Favorite places" />
-            <MenuItem icon={ICON_HISTORY} label="Ride History"    />
-          </div>
-          <div className="pp-rule" />
-
-          {/* Icon-less items: Preferences / Privacy & Policy / Help */}
-          {/* Figma: no leading icon slot — label starts flush left */}
-          <MenuItem icon={null} label="Preferences"     />
-          <MenuItem icon={null} label="Privacy & Policy" />
-          <MenuItem icon={null} label="Help"            />
-
-        </div>
+        {page === null              && <MainView onClose={close} onNavigate={setPage} />}
+        {page === PAGES.PERSONAL    && <PersonalInfoPage onBack={back} />}
+        {page === PAGES.VEHICLE     && <VehicleInfoPage onBack={back} />}
+        {page === PAGES.AVAILABILITY&& <AvailabilityPage onBack={back} />}
+        {page === PAGES.FAVORITES   && <FavoritesPage onBack={back} />}
+        {page === PAGES.HISTORY     && <HistoryPage onBack={back} />}
+        {page === PAGES.PREFERENCES && <PreferencesPage onBack={back} onNavigate={setPage} />}
+        {page === PAGES.LANGUAGE    && <LanguagePage onBack={goPrefsBack} />}
+        {page === PAGES.PRIVACY     && <PrivacyPage onBack={back} />}
+        {page === PAGES.HELP        && <HelpPage onBack={back} />}
       </aside>
     </>
   );

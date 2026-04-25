@@ -1,19 +1,22 @@
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { ChevronLeft } from 'lucide-react';
-import { MapContainer, TileLayer, Marker, Polyline } from 'react-leaflet';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Polyline, useMap } from 'react-leaflet';
 import { useApp } from '../context/AppContext';
+import { useT } from '../i18n';
+import {
+  ChevronLeftIcon, BellIcon, PhoneIcon, MessageIcon,
+  ClockIcon, EuroIcon, MapPinIcon, RouteIcon, CheckIcon,
+} from '../components/Icons';
 import './DriverRideScreen.css';
 
-const ICO_BELL     = 'https://www.figma.com/api/mcp/asset/59948073-7e06-4ba2-a680-5f416f59ded3';
-const ICO_LOCATION = 'https://www.figma.com/api/mcp/asset/dda2a857-50bd-4f19-a578-c6c5dbc1cdc4';
-const ICO_FARE     = 'https://www.figma.com/api/mcp/asset/677ef771-20ca-4de6-a237-65ee0ed4a167';
-const ICO_CLOCK    = 'https://www.figma.com/api/mcp/asset/af30fb73-0d03-4d4e-a15a-0799391019db';
-const ICO_PHONE    = 'https://www.figma.com/api/mcp/asset/d55fd7be-baf6-4ff7-9282-8ab1ac8e6b7a';
-const ICO_PROFILE  = 'https://www.figma.com/api/mcp/asset/b077ac77-cfbb-4762-bf28-081ec92c18ce';
-const ICO_VERIFIED = 'https://www.figma.com/api/mcp/asset/d36eaba8-d17f-4096-b214-819269c26718';
+/* ══════════════════════════════════════════════════════════════════
+   DriverRideScreen — Bolt-style during-ride flow.
+   Full-screen live map + floating bottom sheet with passenger,
+   route, ETA and the status-driven primary CTA.
+   ══════════════════════════════════════════════════════════════════ */
 
-// Map pin icons
+// Map markers — same SVG pattern as RideRequestScreen
 const makePinIcon = (color) => L.divIcon({
   className: '',
   html: `<svg width="28" height="38" viewBox="0 0 28 38" xmlns="http://www.w3.org/2000/svg">
@@ -26,39 +29,38 @@ const makePinIcon = (color) => L.divIcon({
 const PICKUP_ICON  = makePinIcon('#ff6038');
 const DROPOFF_ICON = makePinIcon('#2e3b3b');
 
-function midpoint([la1, lo1], [la2, lo2]) {
-  return [(la1 + la2) / 2, (lo1 + lo2) / 2];
+// Driver marker — orange car silhouette in a white pill
+const CAR_ICON = L.divIcon({
+  className: '',
+  html: `<div style="width:36px;height:36px;border-radius:50%;background:#ff6038;border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;color:#fff;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M15.764 4a3 3 0 0 1 2.683 1.658l1.383 2.765c.244-.1.487-.201.723-.318a1 1 0 0 1 .894 1.79c-.494.246-.72.322-.72.322l.956 1.913c.209.417.317.876.317 1.342V16a3 3 0 0 1-1 2.236V19.5a1.5 1.5 0 0 1-3 0V19H6v.5a1.5 1.5 0 0 1-3 0v-1.264c-.614-.55-1-1.348-1-2.236v-2.528a3 3 0 0 1 .317-1.341l.956-1.914a14 14 0 0 1-.718-.321a1 1 0 0 1-.45-1.343a1.01 1.01 0 0 1 1.347-.445q.354.17.718.315l1.383-2.765A3 3 0 0 1 8.236 4Zm3.07 6.904C17.134 11.441 14.715 12 12 12s-5.134-.56-6.834-1.096l-1.06 2.12a1 1 0 0 0-.106.448V16a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2.528a1 1 0 0 0-.106-.447l-1.06-2.12ZM7.5 13a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3m9 0a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3m-.736-7H8.236a1 1 0 0 0-.894.553L6.072 9.09C7.62 9.555 9.706 10 12 10s4.38-.445 5.927-.91l-1.269-2.537A1 1 0 0 0 15.764 6"/></svg>
+  </div>`,
+  iconSize: [36, 36],
+  iconAnchor: [18, 18],
+});
+
+function lerp(a, b, t) { return a + (b - a) * t; }
+function lerpCoords([la1, lo1], [la2, lo2], t) {
+  return [lerp(la1, la2, t), lerp(lo1, lo2, t)];
+}
+function haversineKm([la1, lo1], [la2, lo2]) {
+  const toRad = (d) => (d * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(la2 - la1);
+  const dLon = toRad(lo2 - lo1);
+  const a = Math.sin(dLat / 2) ** 2 +
+            Math.cos(toRad(la1)) * Math.cos(toRad(la2)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
 }
 
-function getActionButton(status, onStart, onArrive, onBeginTrip, onEnd) {
-  if (status === 'accepted') {
-    return (
-      <button className="drs-action-status-btn drs-btn-orange" onClick={onStart}>
-        Start the ride
-      </button>
-    );
-  }
-  if (status === 'driver_en_route') {
-    return (
-      <button className="drs-action-status-btn drs-btn-dark" onClick={onArrive}>
-        I've Arrived
-      </button>
-    );
-  }
-  if (status === 'driver_arrived') {
-    return (
-      <button className="drs-action-status-btn drs-btn-orange" onClick={onBeginTrip}>
-        Begin Trip
-      </button>
-    );
-  }
-  if (status === 'in_progress') {
-    return (
-      <button className="drs-action-status-btn drs-btn-dark" onClick={onEnd}>
-        End Trip
-      </button>
-    );
-  }
+// Centre/zoom the map on the driver as it moves
+function FollowDriver({ pos, deps }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!pos) return;
+    map.flyTo(pos, Math.max(map.getZoom(), 14), { duration: 0.6 });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
   return null;
 }
 
@@ -68,140 +70,272 @@ export default function DriverRideScreen() {
     closeDriverRide,
     activeRide,
     rideFlowStatus,
-    startRideFlow,
-    driverArrive,
     beginTrip,
     cancelActiveRide,
     completeRide,
     openChat,
+    setActiveTab,
+    setMyRidesTab,
+    dismissRide,
   } = useApp();
+  const t = useT();
+  const [showSummary, setShowSummary] = useState(false);
 
+  // Coords with a sane fallback so the map still renders
   const fromCoords = activeRide?.fromCoords || [52.3791, 4.9003];
   const toCoords   = activeRide?.toCoords   || [52.3105, 4.7683];
-  const mapCenter  = midpoint(fromCoords, toCoords);
-  const mapBounds  = [fromCoords, toCoords];
 
-  const passengerName      = activeRide?.name || 'Passenger';
-  const passengerInitials  = activeRide?.initials || passengerName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-  const passengerVerified  = activeRide?.verified ?? false;
+  // Start the driver at a "nearby" position (~1 km offset south of pickup) so
+  // the en-route phase has visible motion. In production this would be the
+  // driver's GPS.
+  const driverStart = useMemo(
+    () => [fromCoords[0] - 0.01, fromCoords[1] + 0.01],
+    [fromCoords[0], fromCoords[1]],
+  );
 
-  const showChatFab = rideFlowStatus && rideFlowStatus !== 'cancelled' && rideFlowStatus !== 'completed';
+  const [driverPos, setDriverPos] = useState(driverStart);
+  const animRef = useRef(null);
+
+  // Reset driver position + summary state whenever a new ride opens
+  useEffect(() => {
+    if (driverRideOpen) {
+      setDriverPos(driverStart);
+      setShowSummary(false);
+    }
+  }, [driverRideOpen, driverStart]);
+
+  // Animate the driver from the current spot to the destination once the
+  // trip starts. Two stops shown for context (pickup + dropoff) but the
+  // motion is a single continuous segment.
+  useEffect(() => {
+    if (animRef.current) cancelAnimationFrame(animRef.current);
+    if (!driverRideOpen) return;
+    if (rideFlowStatus !== 'in_progress') return; // accepted: stay parked
+
+    const from = driverStart;
+    const to   = toCoords;
+    const durationMs = 14000;
+
+    setDriverPos(from);
+    const t0 = performance.now();
+    const tick = (now) => {
+      const k = Math.min(1, (now - t0) / durationMs);
+      setDriverPos(lerpCoords(from, to, k));
+      if (k < 1) animRef.current = requestAnimationFrame(tick);
+    };
+    animRef.current = requestAnimationFrame(tick);
+    return () => animRef.current && cancelAnimationFrame(animRef.current);
+  }, [rideFlowStatus, driverRideOpen, driverStart, toCoords]);
+
+  const isInProgress = rideFlowStatus === 'in_progress';
+
+  const passengerName     = activeRide?.name || 'Passenger';
+  const passengerInitials = activeRide?.initials
+    || passengerName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  const passengerVerified = activeRide?.verified ?? false;
+  const photoUrl = activeRide?.photo
+    || `https://i.pravatar.cc/120?u=viavia-${passengerName.toLowerCase().replace(/\s+/g, '-')}`;
+  const [photoFailed, setPhotoFailed] = useState(false);
+
+  // ETA for the status pill while driving
+  const remainingKm = useMemo(() => {
+    return isInProgress ? haversineKm(driverPos, toCoords) : null;
+  }, [driverPos, toCoords, isInProgress]);
+  const remainingMin = remainingKm ? Math.max(1, Math.round(remainingKm * 3)) : null;
+
+  // Status copy for the pill at the top
+  const statusCopy =
+      rideFlowStatus === 'accepted'    ? t('drs.status.ready')
+    : rideFlowStatus === 'in_progress' ? t('drs.status.inprogress', { min: remainingMin })
+    : '';
+
+  // Two-step flow: Start → I've arrived → summary
+  const handleArrived = () => setShowSummary(true);
+  const handleDone = () => {
+    if (activeRide?.id) dismissRide(activeRide.id);   // archive completed trip
+    completeRide();
+    setActiveTab('home');
+    setMyRidesTab('driving');
+  };
+
+  const primaryCta =
+      rideFlowStatus === 'accepted'    ? { label: t('drs.cta.start'),   onClick: beginTrip,     variant: 'orange' }
+    : rideFlowStatus === 'in_progress' ? { label: t('drs.cta.arrived'), onClick: handleArrived, variant: 'dark'   }
+    : null;
+
+  if (!driverRideOpen) return null;
 
   return (
-    <div className={`drs-overlay${driverRideOpen ? ' open' : ''}`}>
-      {/* HEADER */}
-      <div className="drs-header">
-        <div className="drs-header-pill">
-          <button className="drs-back-btn" onClick={closeDriverRide}>
-            <ChevronLeft size={18} strokeWidth={2.2} color="#1a1a1a" />
-          </button>
-          <span className="drs-header-title">Ride Details</span>
-          <button className="drs-bell-btn">
-            <img src={ICO_BELL} alt="" className="drs-bell-ico" />
-          </button>
-        </div>
-      </div>
+    <div className="drs-overlay open">
 
-      {/* SCROLLABLE CONTENT */}
-      <div className="drs-content">
-
-        {/* Passenger info card */}
-        <div className="drs-card">
-          <div className="drs-passenger-row">
-            <div className="drs-avatar-container">
-              <img src={ICO_PROFILE} alt="" className="drs-avatar-ico" />
-            </div>
-            <div className="drs-passenger-info">
-              <span className="drs-passenger-name">{passengerName}</span>
-              <div className="drs-verified-row">
-                <img src={ICO_VERIFIED} alt="" className="drs-verified-ico" />
-                <span className="drs-verified-label">Verified Passenger</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Map card */}
-        <div className="drs-card">
-          {/* Map */}
-          <div className="drs-map-wrap">
-            {driverRideOpen && (
-              <MapContainer
-                key={activeRide?.id || 'driver-map'}
-                bounds={mapBounds}
-                boundsOptions={{ padding: [32, 32] }}
-                zoomControl={false}
-                dragging={false}
-                scrollWheelZoom={false}
-                touchZoom={false}
-                doubleClickZoom={false}
-                keyboard={false}
-                style={{ width: '100%', height: '100%' }}
-              >
-                <TileLayer
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
-                />
-                <Marker position={fromCoords} icon={PICKUP_ICON} />
-                <Marker position={toCoords} icon={DROPOFF_ICON} />
-                <Polyline
-                  positions={[fromCoords, toCoords]}
-                  pathOptions={{ color: '#ff6038', weight: 2.5, dashArray: '8 6', opacity: 0.9 }}
-                />
-              </MapContainer>
-            )}
-          </div>
-
-          {/* Trip info */}
-          <div className="drs-trip-info">
-            <div className="drs-trip-row">
-              <img src={ICO_LOCATION} alt="" className="drs-trip-ico" />
-              <p className="drs-trip-text">
-                <strong>{activeRide?.from || 'Pickup'}</strong>
-                {' '}→{' '}
-                <strong>{activeRide?.to || 'Dropoff'}</strong>
-              </p>
-            </div>
-            <div className="drs-trip-row">
-              <img src={ICO_FARE} alt="" className="drs-trip-ico" />
-              <span className="drs-fare-text">{activeRide?.price || '€ 0.00'}</span>
-            </div>
-            <div className="drs-trip-row">
-              <img src={ICO_CLOCK} alt="" className="drs-trip-ico" />
-              <span className="drs-time-text">{activeRide?.when || '—'}</span>
-            </div>
-          </div>
-
-          {/* Status action button */}
-          {getActionButton(
-            rideFlowStatus,
-            startRideFlow,
-            driverArrive,
-            beginTrip,
-            completeRide,
+      {/* ── Full-screen live map ────────────────────────── */}
+      <div className="drs-map">
+        <MapContainer
+          key={activeRide?.id || 'driver-map'}
+          center={driverStart}
+          zoom={14}
+          zoomControl={false}
+          attributionControl={false}
+          dragging={true}
+          scrollWheelZoom={false}
+          style={{ width: '100%', height: '100%' }}
+        >
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; OSM'
+          />
+          <Marker position={fromCoords} icon={PICKUP_ICON} />
+          <Marker position={toCoords}   icon={DROPOFF_ICON} />
+          <Marker position={driverPos}  icon={CAR_ICON} />
+          {/* Solid orange route while driving, faint dashed before */}
+          {isInProgress ? (
+            <Polyline
+              positions={[driverPos, toCoords]}
+              pathOptions={{ color: '#ff6038', weight: 4, opacity: 0.95 }}
+            />
+          ) : (
+            <Polyline
+              positions={[fromCoords, toCoords]}
+              pathOptions={{ color: '#2e3b3b', weight: 2.5, dashArray: '6 6', opacity: 0.4 }}
+            />
           )}
-        </div>
-
-        {/* Action row */}
-        <div className="drs-action-row">
-          <button className="drs-cancel-btn" onClick={cancelActiveRide}>
-            Cancel
-          </button>
-          <button className="drs-call-btn">
-            <img src={ICO_PHONE} alt="" className="drs-phone-ico" />
-            Call Passenger
-          </button>
-        </div>
-
+          <FollowDriver pos={driverPos} deps={[rideFlowStatus]} />
+        </MapContainer>
       </div>
 
-      {/* Chat FAB */}
-      {showChatFab && (
-        <button className="drs-chat-fab" onClick={openChat}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
+      {/* ── Floating top bar: back + status pill + bell ────── */}
+      <div className="drs-top">
+        <button className="drs-icon-btn" onClick={closeDriverRide} aria-label={t('common.back')}>
+          <ChevronLeftIcon size={20} style={{ color: '#1a1a1a' }} />
         </button>
+        {statusCopy && <div className="drs-status-pill">{statusCopy}</div>}
+        <button className="drs-icon-btn" aria-label={t('notif.title')}>
+          <BellIcon size={20} style={{ color: '#1a1a1a' }} />
+        </button>
+      </div>
+
+      {/* ── Bottom sheet — either live trip card OR summary ── */}
+      {showSummary ? (
+        <div className="drs-sheet drs-summary">
+          <div className="drs-summary-check">
+            <CheckIcon size={32} style={{ color: '#ffffff' }} />
+          </div>
+          <h2 className="drs-summary-title">{t('drs.summary.title')}</h2>
+          <p className="drs-summary-sub">
+            {t('drs.summary.sub', { name: passengerName.split(' ')[0] })}
+          </p>
+
+          <div className="drs-summary-route">
+            <div className="drs-route-pins" aria-hidden="true">
+              <span className="drs-route-dot pickup" />
+              <span className="drs-route-line" />
+              <span className="drs-route-dot drop" />
+            </div>
+            <div className="drs-route-text">
+              <p className="drs-route-place">{activeRide?.from || 'Pickup'}</p>
+              <p className="drs-route-place">{activeRide?.to   || 'Dropoff'}</p>
+            </div>
+          </div>
+
+          <div className="drs-summary-stats">
+            <div className="drs-summary-stat">
+              <span className="drs-summary-stat-val">{activeRide?.duration || '—'}</span>
+              <span className="drs-summary-stat-lbl">{t('drs.summary.duration')}</span>
+            </div>
+            <span className="drs-summary-stat-sep" />
+            <div className="drs-summary-stat">
+              <span className="drs-summary-stat-val">{activeRide?.distance || '—'}</span>
+              <span className="drs-summary-stat-lbl">{t('drs.summary.distance')}</span>
+            </div>
+            <span className="drs-summary-stat-sep" />
+            <div className="drs-summary-stat">
+              <span className="drs-summary-stat-val drs-summary-earnings">{activeRide?.price || '—'}</span>
+              <span className="drs-summary-stat-lbl">{t('drs.summary.earnings')}</span>
+            </div>
+          </div>
+
+          <button className="drs-primary drs-primary-orange" onClick={handleDone}>
+            {t('drs.summary.done')}
+          </button>
+        </div>
+      ) : (
+      <div className="drs-sheet">
+        <div className="drs-sheet-handle" aria-hidden="true" />
+
+        {/* Passenger row */}
+        <div className="drs-pax">
+          {!photoFailed ? (
+            <img
+              src={photoUrl}
+              alt={passengerName}
+              className="drs-pax-photo"
+              onError={() => setPhotoFailed(true)}
+            />
+          ) : (
+            <div className="drs-pax-fallback" aria-hidden="true">{passengerInitials}</div>
+          )}
+          <div className="drs-pax-info">
+            <p className="drs-pax-name">{passengerName}</p>
+            <p className="drs-pax-sub">
+              {passengerVerified ? t('rds.verifiedMember') : t('drs.passenger')}
+            </p>
+          </div>
+          <button className="drs-mini-btn" onClick={openChat} aria-label={t('rds.chat')}>
+            <MessageIcon size={18} style={{ color: '#1a1a1a' }} />
+          </button>
+          <button className="drs-mini-btn" aria-label={t('drs.call')}>
+            <PhoneIcon size={18} style={{ color: '#1a1a1a' }} />
+          </button>
+        </div>
+
+        <div className="drs-divider" />
+
+        {/* Trip route */}
+        <div className="drs-route">
+          <div className="drs-route-pins" aria-hidden="true">
+            <span className="drs-route-dot pickup" />
+            <span className="drs-route-line" />
+            <span className="drs-route-dot drop" />
+          </div>
+          <div className="drs-route-text">
+            <p className="drs-route-place">{activeRide?.from || 'Pickup'}</p>
+            <p className="drs-route-place">{activeRide?.to   || 'Dropoff'}</p>
+          </div>
+        </div>
+
+        {/* Trip stats */}
+        <div className="drs-stats">
+          <div className="drs-stat">
+            <ClockIcon size={18} style={{ color: '#727272' }} />
+            <span>{activeRide?.duration || '—'}</span>
+          </div>
+          <div className="drs-stat">
+            <RouteIcon size={18} style={{ color: '#727272' }} />
+            <span>{activeRide?.distance || '—'}</span>
+          </div>
+          <div className="drs-stat">
+            <EuroIcon size={18} style={{ color: '#727272' }} />
+            <span>{activeRide?.price || '—'}</span>
+          </div>
+        </div>
+
+        {/* Primary CTA */}
+        {primaryCta && (
+          <button
+            className={`drs-primary drs-primary-${primaryCta.variant}`}
+            onClick={primaryCta.onClick}
+          >
+            {primaryCta.label}
+          </button>
+        )}
+
+        {/* Cancel — destructive secondary action */}
+        {rideFlowStatus !== 'in_progress' && (
+          <button className="drs-cancel" onClick={cancelActiveRide}>
+            {t('drs.cancel')}
+          </button>
+        )}
+      </div>
       )}
     </div>
   );

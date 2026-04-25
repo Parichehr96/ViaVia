@@ -2,3 +2,9 @@ node_modules/
 dist/
 .env
 .DS_Store
+
+# Dev-only artefacts (alternate Tailwind project, downloaded skill assets,
+# locally tweaked Claude permission file)
+ViaVia_V02
+viavia/
+.claude/settings.local.json

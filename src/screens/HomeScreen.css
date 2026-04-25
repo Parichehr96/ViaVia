@@ -1,347 +1,364 @@
 /* ══════════════════════════════════════════════════════════════════
-   HomeScreen — pixel-perfect match to Figma node 167:6399
+   HomeScreen (Ride tab) — Figma 82:20266 / 83:20703
+   Profile container: flex-col gap-20, px-20 py-16, overflow-clip
    ══════════════════════════════════════════════════════════════════ */
 
-/* ── Outer wrapper: relative container for FAB + scroll ───────── */
-.hs-wrapper {
-  flex: 1;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  background: #f5f5f5;
-}
-
-/* ── Inner scrollable column ───────────────────────────────────── */
 .hs-root {
   flex: 1;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px 20px 24px;
-  background: #f5f5f5;
+  gap: 20px;
+  padding: 16px 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  background: #e0eaeb;
+  min-height: 0;
 }
-
-/* Hide scrollbar */
 .hs-root::-webkit-scrollbar { display: none; }
-.hs-root { scrollbar-width: none; }
 
-/* Hide scrollbar */
-.hs-root::-webkit-scrollbar { display: none; }
-.hs-root { scrollbar-width: none; }
-
-/* ── Section title ─────────────────────────────────────────────── */
-.hs-section-title {
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 24px;
-  letter-spacing: 0.15px;
-  color: #1e1e1e;
-  flex-shrink: 0;
-}
-
-/* ── White cards ───────────────────────────────────────────────── */
-.hs-card {
+/* ══════════════════════════════════════════════════════════════════
+   "Need to be anywhere?" card — Figma 82:20601
+   bg white, rounded 16, padding 16, gap 16
+   ══════════════════════════════════════════════════════════════════ */
+.hs-request-card {
   background: #ffffff;
-  border-radius: 20px;
+  border-radius: 16px;
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 16px;
   flex-shrink: 0;
-  width: 100%;
 }
 
-/* ── Divider ───────────────────────────────────────────────────── */
-.hs-divider {
-  width: 100%;
-  height: 1px;
-  background: #e8f0f0;
-  flex-shrink: 0;
+.hs-card-title {
+  font-family: 'Roboto', sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 28px;
+  color: #1e1e1e;
+  margin: 0;
+  letter-spacing: 0;
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   Card 1 – Location
-   ══════════════════════════════════════════════════════════════════ */
-.hs-loc-row {
+.hs-cta-group {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.hs-loc-icon-wrap {
-  flex-shrink: 0;
-  width: 48px;
+/* Primary CTA — Figma 84:21486 */
+.hs-cta-primary {
   height: 48px;
-  background: #f5f5f5;
-  border-radius: 12px;
+  background: #ff6038;
+  border: none;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.hs-loc-icon-img {
-  width: 24px;
-  height: 24px;
-  display: block;
-}
-
-.hs-loc-field {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  text-align: left;
+  gap: 8px;
+  padding: 12px;
   cursor: pointer;
-  background: none;
-  border: none;
-  padding: 0;
-}
-
-
-.hs-field-label {
-  font-family: 'Roboto', sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 20px;
-  letter-spacing: 0.1px;
-  color: #000000;
-}
-
-.hs-field-value {
+  color: #f5f5f5;
   font-family: 'Inter', 'Roboto', sans-serif;
   font-size: 16px;
   font-weight: 400;
   line-height: 1;
+  transition: transform 0.12s ease, background 0.2s ease;
+}
+.hs-cta-primary:hover  { background: #ef5a34; }
+.hs-cta-primary:active { transform: scale(0.98); }
+
+/* Secondary CTA — Figma 84:21493 */
+.hs-cta-secondary {
+  height: 48px;
+  background: transparent;
+  border: 1px solid rgba(120, 120, 120, 0.2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  cursor: pointer;
+  color: #e85733;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1;
+  transition: background 0.15s ease;
+}
+.hs-cta-secondary:hover  { background: rgba(232, 87, 51, 0.04); }
+.hs-cta-secondary:active { background: rgba(232, 87, 51, 0.10); }
+
+/* ══════════════════════════════════════════════════════════════════
+   My Rides section — Figma 82:20302
+   gap-8 col
+   ══════════════════════════════════════════════════════════════════ */
+.hs-rides-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+}
+
+.hs-section-title {
+  font-family: 'Roboto', sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 28px;
   color: #1e1e1e;
+  margin: 0;
+}
+
+/* ── Segmented tabs — Figma 82:20303 ─────────────────────────
+   bg white, rounded 233, p-4 — inner "stretch" container h-36 */
+.hs-tabbar {
+  background: #ffffff;
+  border-radius: 233px;
+  padding: 4px;
+  display: flex;
+  height: 44px;   /* 4px padding + 36px inner */
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.hs-tab {
+  flex: 1;
+  height: 36px;
+  background: transparent;
+  border: none;
+  border-radius: 100px;
+  padding: 8px 18px;
+  cursor: pointer;
+  font-family: 'SF Pro', -apple-system, 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 510;                  /* SF Pro Medium */
+  line-height: 20px;
+  letter-spacing: -0.23px;
+  color: #1a1a1a;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.hs-tab.active {
+  background: #2e3b3b;
+  color: #f5f5f5;
+  font-weight: 700;                  /* SF Pro Bold */
+}
+
+/* Rides list */
+.hs-rides-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Empty state — Figma 83:20855 + 114:22130 (carpool illustration) */
+.hs-empty-state {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px 16px 16px;
+}
+.hs-empty-illustration {
+  width: 270px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+.hs-empty-state p {
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 28px;
+  color: #1e1e1e;
+  text-align: center;
+  margin: 0;
+  letter-spacing: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Ride card — Figma 83:20748
+   ══════════════════════════════════════════════════════════════════ */
+.hs-ride-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.hs-ride-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+.hs-ride-when {
+  flex: 1;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.4px;
+  color: #1e1e1e;
+  margin: 0;
+}
+
+.hs-ride-divider { height: 1px; background: #e8f0f0; }
+
+.hs-ride-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hs-ride-avatar {
+  flex-shrink: 0;
+  width: 41px;
+  height: 41px;
+  border-radius: 50%;
+  background: #d1d5d9;
+}
+.hs-ride-avatar-img {
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #d1d5d9;
+  display: block;
+}
+.hs-ride-avatar-fallback {
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #d1d5d9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e1e1e;
+}
+.hs-ride-user-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.hs-ride-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.hs-ride-name {
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #1e1e1e;
+}
+.hs-ride-mutuals {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.hs-mutual-dots {
+  display: flex;
+  gap: 2px;
+}
+.hs-mutual-dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #d9d9d9;
+  border: 1.5px solid #ffffff;
+}
+.hs-mutual-text {
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: #1e1e1e;
+}
+
+/* Route with vertical connector */
+.hs-ride-route {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+  justify-content: flex-end;
+}
+.hs-ride-route-dots {
+  flex-shrink: 0;
+  width: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 0;
+}
+.hs-route-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #ff6038;
+  background: #ffffff;
+}
+.hs-route-dot.filled { background: #ff6038; }
+.hs-route-line {
+  flex: 1;
+  width: 2px;
+  margin: 2px 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    #ff6038 0 3px,
+    transparent 3px 6px
+  );
+  min-height: 14px;
+}
+.hs-ride-route-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 2px 0;
+}
+.hs-route-place {
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #1e1e1e;
+  margin: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.hs-field-value.placeholder {
-  color: #9ca3af;
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   Card 2 – Date & Time
-   ══════════════════════════════════════════════════════════════════ */
-.hs-dt-card {
-  gap: 16px;
-}
-
-.hs-dt-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.hs-dt-pill {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  background: #f5f5f5;
-  border-radius: 100px;
-  padding: 6px 11px;
-  border: none;
-  cursor: pointer;
-  height: 34px;
-  transition: background 0.15s;
-}
-
-
-.hs-dt-pill-text {
-  font-family: 'SF Pro', -apple-system, 'Helvetica Neue', sans-serif;
-  font-size: 17px;
-  font-weight: 400;
-  line-height: 22px;
-  letter-spacing: -0.43px;
-  color: #000000;
-  white-space: nowrap;
-}
-
-.hs-dt-arrows {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
-  flex-shrink: 0;
-  line-height: 1;
-}
-
-.hs-dt-info-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-}
-
-.hs-dt-label {
-  font-family: 'Roboto', sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 20px;
-  letter-spacing: 0.1px;
-  color: #232d2d;
-  flex: 1;
-}
-
-.hs-dt-est {
-  font-family: 'Roboto', sans-serif;
-  font-size: 13px;
-  font-weight: 400;
-  color: #2e3b3b;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   Card 3 – Payment
-   ══════════════════════════════════════════════════════════════════ */
-.hs-pay-card {
-  gap: 12px;
-}
-
-.hs-pay-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  width: 100%;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  flex-shrink: 0;
-}
-
-.hs-pay-label {
-  font-family: 'Roboto', sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 20px;
-  letter-spacing: 0.1px;
-  color: #232d2d;
-  flex: 1;
-  text-align: left;
-}
-
-.hs-radio-img {
-  width: 24px;
-  height: 24px;
-  display: block;
-  flex-shrink: 0;
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   Confirm button
-   ══════════════════════════════════════════════════════════════════ */
-.hs-confirm-btn {
-  flex-shrink: 0;
+/* More Info button */
+.hs-more-info-btn {
   width: 100%;
   height: 48px;
-  background: #ff6038;
+  background: transparent;
+  border: 1.6px solid #e85733;
   border-radius: 8px;
-  border: none;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  color: #f5f5f5;
-  letter-spacing: 0;
-  transition: background 0.15s, transform 0.1s;
-}
-
-
-.hs-confirm-btn:active:not(.disabled) {
-  transform: scale(0.98);
-}
-
-.hs-confirm-btn.disabled {
-  background: #ff6038;
-  opacity: 0.45;
-  cursor: default;
-}
-
-.hs-spinner {
-  width: 20px;
-  height: 20px;
-  border: 2.5px solid rgba(255,255,255,0.35);
-  border-top-color: #ffffff;
-  border-radius: 50%;
-  animation: hs-spin 0.7s linear infinite;
-}
-
-@keyframes hs-spin {
-  to { transform: rotate(360deg); }
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   FAB – floating action button (call)
-   Sits in .hs-wrapper (position: relative), absolute bottom-right
-   ══════════════════════════════════════════════════════════════════ */
-.hs-fab {
-  position: absolute;
-  /* Figma: bottom-[20px] right-[20px] — 20px above nav, 20px from right edge */
-  bottom: 20px;
-  right: 20px;
-  width: 72px;
-  height: 72px;
-  border-radius: 44px;
-  background: #ff6038;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0px 6px 10px rgba(0,0,0,0.15), 0px 2px 3px rgba(0,0,0,0.3);
-  transition: transform 0.15s, box-shadow 0.15s;
-  z-index: 20;
-}
-
-
-.hs-fab:active {
-  transform: scale(0.96);
-}
-
-.hs-fab-icon {
-  width: 32px;
-  height: 32px;
-  display: block;
-  /* make white on the orange bg */
-  filter: brightness(0) invert(1);
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   Toast
-   ══════════════════════════════════════════════════════════════════ */
-.hs-toast {
-  position: absolute;
-  bottom: 108px; /* above FAB */
-  left: 20px;
-  right: 20px;
-  background: #1e1e1e;
-  color: #ffffff;
-  padding: 14px 18px;
-  border-radius: 12px;
   font-family: 'Roboto', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  text-align: center;
-  z-index: 30;
-  animation: hs-toast-in 0.3s cubic-bezier(0.33,1,0.68,1);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.20);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: 0.15px;
+  color: #e85733;
+  transition: background 0.15s ease;
 }
-
-@keyframes hs-toast-in {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+.hs-more-info-btn:hover  { background: rgba(232, 87, 51, 0.04); }
+.hs-more-info-btn:active { background: rgba(232, 87, 51, 0.10); }

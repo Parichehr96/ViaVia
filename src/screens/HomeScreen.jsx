@@ -1,257 +1,179 @@
-import { useState, useEffect } from 'react';
-import { ChevronUp, ChevronDown } from 'lucide-react';
+import { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import DateTimePicker from '../components/DateTimePicker';
+import { useT } from '../i18n';
+import { CarIcon, PhoneIcon, ClockIcon, VerifiedIcon } from '../components/Icons';
+import emptyStateIllustration from '../assets/empty-state-carpool.png';
 import './HomeScreen.css';
 
-// ── Figma asset URLs (node 167:6399) ─────────────────────────────────────────
-const LOC_FROM_ICON = 'https://www.figma.com/api/mcp/asset/1fae0846-7726-4918-bd11-1440cfe55ce3';
-const LOC_TO_ICON   = 'https://www.figma.com/api/mcp/asset/3874a79e-9277-47d2-a8bb-e87279fbbaf5';
-const RADIO_ON      = 'https://www.figma.com/api/mcp/asset/be603a3f-2236-4f19-be52-e7bc0f91e90d';
-const RADIO_OFF     = 'https://www.figma.com/api/mcp/asset/5b25d791-5e0e-4ec0-99b4-1c66377c4865';
-const CALL_ICON     = 'https://www.figma.com/api/mcp/asset/ffbcd26c-70a4-4cdd-b196-d66b1fa290fc';
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-function formatDateLabel(d) {
-  const today = new Date();
-  const isToday = d.toDateString() === today.toDateString();
-  const prefix = isToday ? 'Today, ' : '';
-  return `${prefix}${MONTHS_SHORT[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+// Profile-photo avatar (img → initials fallback). Same pattern as Community.
+function RideAvatar({ name, photo, initials, size = 41 }) {
+  const [failed, setFailed] = useState(false);
+  const url = photo
+    || `https://i.pravatar.cc/120?u=viavia-${(name || 'r').toLowerCase().replace(/\s+/g, '-')}`;
+  if (!failed) {
+    return (
+      <img
+        src={url}
+        alt={name}
+        className="hs-ride-avatar-img"
+        style={{ width: size, height: size }}
+        onError={() => setFailed(true)}
+      />
+    );
+  }
+  return (
+    <div
+      className="hs-ride-avatar-fallback"
+      style={{ width: size, height: size }}
+      aria-label={name}
+    >
+      {initials || '?'}
+    </div>
+  );
 }
 
-function formatDatePill(d) {
-  return `${MONTHS_SHORT[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+// ── Ride card — Figma 83:20748 ──────────────────────────────────
+function RideCard({ ride, onMoreInfo }) {
+  return (
+    <div className="hs-ride-card">
+      {/* Date/time header */}
+      <div className="hs-ride-header">
+        <ClockIcon size={24} style={{ color: '#1e1e1e' }} />
+        <p className="hs-ride-when">{ride.when || '14:15, Today'}</p>
+      </div>
+
+      <div className="hs-ride-divider" />
+
+      {/* User row */}
+      <div className="hs-ride-user">
+        <RideAvatar name={ride.name} photo={ride.photo} initials={ride.initials} />
+        <div className="hs-ride-user-info">
+          <div className="hs-ride-name-row">
+            <span className="hs-ride-name">{ride.name}</span>
+            {ride.verified && (
+              <VerifiedIcon size={16} style={{ color: '#ff6038' }} />
+            )}
+          </div>
+          <div className="hs-ride-mutuals">
+            <span className="hs-mutual-dots">
+              <span /><span /><span />
+            </span>
+            <span className="hs-mutual-text">
+              {ride.communities ? `${ride.communities} mutual friends!` : '3 mutual friends!'}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Pickup / Dropoff with vertical connector */}
+      <div className="hs-ride-route">
+        <div className="hs-ride-route-dots" aria-hidden="true">
+          <span className="hs-route-dot" />
+          <span className="hs-route-line" />
+          <span className="hs-route-dot filled" />
+        </div>
+        <div className="hs-ride-route-text">
+          <p className="hs-route-place">{ride.from}</p>
+          <p className="hs-route-place">{ride.to}</p>
+        </div>
+      </div>
+
+      {/* More Info button */}
+      <button className="hs-more-info-btn" onClick={() => onMoreInfo(ride)}>
+        More Info
+      </button>
+    </div>
+  );
 }
 
-function formatTimePill(h, m, ampm) {
-  return `${h}:${String(m).padStart(2,'0')} ${ampm}`;
+function EmptyState() {
+  const t = useT();
+  return (
+    <div className="hs-empty-state">
+      <img
+        src={emptyStateIllustration}
+        alt=""
+        className="hs-empty-illustration"
+      />
+      <p>{t('home.empty')}</p>
+    </div>
+  );
 }
 
-function formatDtpValue(d, h, m, ampm) {
-  const today = new Date();
-  const isToday = d.toDateString() === today.toDateString();
-  const prefix = isToday ? 'Today' : `${MONTHS_SHORT[d.getMonth()]} ${d.getDate()}`;
-  return `${prefix}, ${h}:${String(m).padStart(2,'0')} ${ampm}`;
-}
-
-// ── Component ─────────────────────────────────────────────────────────────────
 export default function HomeScreen() {
   const {
-    addRideRequest, setActiveTab, openRideFlow,
-    rideFlowResult, clearRideFlowResult,
-    showRideToast, setTargetCommunityTab,
+    openRideFlow, rideRequests, acceptedRides, dismissedRides, openRideDetail,
+    myRidesTab, setMyRidesTab,
+    openCall,
   } = useApp();
+  const t = useT();
 
-  // Location state — filled either manually or by the map ride flow
-  const [from, setFrom]           = useState('Your current location');
-  const [to, setTo]               = useState('');
-  const [fromCoords, setFromCoords] = useState(null);
-  const [toCoords, setToCoords]     = useState(null);
+  const drivingRides = rideRequests.filter(
+    r => acceptedRides.has(r.id) && !r.isOwn && !dismissedRides.has(r.id)
+  );
+  const ridingRides  = rideRequests.filter(
+    r => r.isOwn && !dismissedRides.has(r.id)
+  );
+  const activeRides  = myRidesTab === 'driving' ? drivingRides : ridingRides;
 
-  // Date / time state — initialised to "now" on mount
-  const [selDate, setSelDate]   = useState(() => new Date());
-  const [selHour, setSelHour]   = useState(() => { const h = new Date().getHours(); return h % 12 || 12; });
-  const [selMin,  setSelMin]    = useState(() => new Date().getMinutes());
-  const [selAMPM, setSelAMPM]   = useState(() => new Date().getHours() < 12 ? 'AM' : 'PM');
-  const [dtpOpen, setDtpOpen]   = useState(false);
-
-  // Consume ride flow result when the map overlay closes
-  useEffect(() => {
-    if (!rideFlowResult) return;
-    setFrom(rideFlowResult.pickupLoc.label);
-    setTo(rideFlowResult.dropoffLoc.label);
-    setFromCoords(rideFlowResult.pickupLoc.coords);
-    setToCoords(rideFlowResult.dropoffLoc.coords);
-    clearRideFlowResult();
-  }, [rideFlowResult]);
-
-  // Payment state
-  const [payment, setPayment] = useState('digital');
-
-  // UI state
-  const [loading, setLoading] = useState(false);
-
-  const canConfirm = from.trim() && to.trim();
-
-  // ── DateTimePicker bridge ─────────────────────────────────────────────────
-  // The existing DTP returns a formatted string like "Today, 3:30 PM"
-  // We parse it back to update our pill states
-  function handleDtpConfirm(val) {
-    // val is like "Today, 3:30 PM" or "Apr 16, 3:30 PM"
-    const match = val.match(/(\d+):(\d+)\s+(AM|PM)/);
-    if (match) {
-      setSelHour(parseInt(match[1], 10));
-      setSelMin(parseInt(match[2], 10));
-      setSelAMPM(match[3]);
-    }
-    setDtpOpen(false);
+  function handleCallForRide() {
+    openCall();
   }
 
-  // ── Confirm ride ──────────────────────────────────────────────────────────
-  function handleConfirm() {
-    if (!canConfirm) return;
-    setLoading(true);
-    setTimeout(() => {
-      const rideId = Date.now();
-      addRideRequest({
-        id: rideId,
-        name: 'John Doe',
-        avatar: null,
-        initials: 'JD',
-        communities: 2,
-        verified: true,
-        match: Math.floor(75 + Math.random() * 20),
-        price: '€ 4.50',
-        from,
-        to,
-        when: formatDtpValue(selDate, selHour, selMin, selAMPM),
-        duration: '~15 min',
-        distance: '—',
-        fromCoords: fromCoords || [52.3676, 4.9041],
-        toCoords:   toCoords   || [52.3500, 4.9200],
-        isOwn: true,
-      });
-      setLoading(false);
-      // Show the app-level ride toast and navigate to My Rides
-      showRideToast({ id: rideId, from, to });
-      setActiveTab('community');
-      setTargetCommunityTab('mine');
-    }, 900);
-  }
-
-  // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="hs-wrapper">
     <div className="hs-root">
+      {/* ═════ "Need to be anywhere?" card ═════ */}
+      <div className="hs-request-card">
+        <h2 className="hs-card-title">{t('home.cta.title')}</h2>
 
-      {/* ── Card 1: Location ──────────────────────────────────── */}
-      <p className="hs-section-title">Where can we get you today?</p>
-
-      <div className="hs-card">
-        {/* From row — opens map-based ride flow */}
-        <div className="hs-loc-row">
-          <div className="hs-loc-icon-wrap">
-            <img src={LOC_FROM_ICON} alt="" className="hs-loc-icon-img" />
-          </div>
-          <button className="hs-loc-field" onClick={() => openRideFlow('pickup')}>
-            <p className="hs-field-label">Where are you at?</p>
-            <p className={`hs-field-value${!from ? ' placeholder' : ''}`}>
-              {from || 'Your current location'}
-            </p>
+        <div className="hs-cta-group">
+          <button
+            className="hs-cta-primary"
+            onClick={() => openRideFlow('search')}
+          >
+            <CarIcon size={24} style={{ color: '#f5f5f5' }} />
+            <span>{t('home.cta.request')}</span>
           </button>
-        </div>
 
-        <div className="hs-divider" />
-
-        {/* To row — opens map-based ride flow, skipping pickup step */}
-        <div className="hs-loc-row">
-          <div className="hs-loc-icon-wrap">
-            <img src={LOC_TO_ICON} alt="" className="hs-loc-icon-img" />
-          </div>
-          <button className="hs-loc-field" onClick={() => openRideFlow('dropoff')}>
-            <p className="hs-field-label">Where do you want to go?</p>
-            <p className={`hs-field-value${!to ? ' placeholder' : ''}`}>
-              {to || '\u200B'}
-            </p>
+          <button
+            className="hs-cta-secondary"
+            onClick={handleCallForRide}
+          >
+            <PhoneIcon size={22} style={{ color: '#e85733' }} />
+            <span>{t('home.cta.call')}</span>
           </button>
         </div>
       </div>
 
-      {/* ── Card 2: Date & Time ───────────────────────────────── */}
-      <div className="hs-card hs-dt-card">
-        {/* Pill row */}
-        <div className="hs-dt-row">
-          {/* Date pill */}
-          <button className="hs-dt-pill" onClick={() => setDtpOpen(true)}>
-            <span className="hs-dt-pill-text">{formatDatePill(selDate)}</span>
-            <span className="hs-dt-arrows">
-              <ChevronUp size={14} strokeWidth={2.5} color="#ff6038" />
-              <ChevronDown size={14} strokeWidth={2.5} color="#ff6038" style={{ marginTop: -2 }} />
-            </span>
-          </button>
+      {/* ═════ My Rides section ═════ */}
+      <div className="hs-rides-section">
+        <h2 className="hs-section-title">{t('home.myrides')}</h2>
 
-          {/* Time pill */}
-          <button className="hs-dt-pill" onClick={() => setDtpOpen(true)}>
-            <span className="hs-dt-pill-text">{formatTimePill(selHour, selMin, selAMPM)}</span>
-            <span className="hs-dt-arrows">
-              <ChevronUp size={14} strokeWidth={2.5} color="#ff6038" />
-              <ChevronDown size={14} strokeWidth={2.5} color="#ff6038" style={{ marginTop: -2 }} />
-            </span>
+        <div className="hs-tabbar">
+          <button
+            className={`hs-tab${myRidesTab === 'driving' ? ' active' : ''}`}
+            onClick={() => setMyRidesTab('driving')}
+          >
+            {t('home.tab.driving')}
+          </button>
+          <button
+            className={`hs-tab${myRidesTab === 'riding' ? ' active' : ''}`}
+            onClick={() => setMyRidesTab('riding')}
+          >
+            {t('home.tab.riding')}
           </button>
         </div>
 
-        {/* Label row */}
-        <div className="hs-dt-info-row">
-          <p className="hs-dt-label">{formatDateLabel(selDate)}</p>
-          <p className="hs-dt-est">15 mins [estimated]</p>
+        <div className="hs-rides-list">
+          {activeRides.length === 0 ? (
+            <EmptyState />
+          ) : (
+            activeRides.map(ride => (
+              <RideCard key={ride.id} ride={ride} onMoreInfo={openRideDetail} />
+            ))
+          )}
         </div>
       </div>
-
-      {/* ── Card 3: Payment ───────────────────────────────────── */}
-      <div className="hs-card hs-pay-card">
-        {/* Digital */}
-        <button className="hs-pay-row" onClick={() => setPayment('digital')}>
-          <p className="hs-pay-label">Digital payment</p>
-          <img
-            src={payment === 'digital' ? RADIO_ON : RADIO_OFF}
-            alt={payment === 'digital' ? 'Selected' : 'Unselected'}
-            className="hs-radio-img"
-          />
-        </button>
-
-        <div className="hs-divider" />
-
-        {/* Cash */}
-        <button className="hs-pay-row" onClick={() => setPayment('cash')}>
-          <p className="hs-pay-label">Cash payment</p>
-          <img
-            src={payment === 'cash' ? RADIO_ON : RADIO_OFF}
-            alt={payment === 'cash' ? 'Selected' : 'Unselected'}
-            className="hs-radio-img"
-          />
-        </button>
-
-        <div className="hs-divider" />
-
-        {/* Credit */}
-        <button className="hs-pay-row" onClick={() => setPayment('credit')}>
-          <p className="hs-pay-label">Credit  payment</p>
-          <img
-            src={payment === 'credit' ? RADIO_ON : RADIO_OFF}
-            alt={payment === 'credit' ? 'Selected' : 'Unselected'}
-            className="hs-radio-img"
-          />
-        </button>
-      </div>
-
-      {/* ── Confirm button ────────────────────────────────────── */}
-      <button
-        className={`hs-confirm-btn${!canConfirm ? ' disabled' : ''}${loading ? ' loading' : ''}`}
-        onClick={handleConfirm}
-        disabled={!canConfirm || loading}
-      >
-        {loading
-          ? <span className="hs-spinner" />
-          : 'Confirm'
-        }
-      </button>
-
-      {/* ── Overlays ──────────────────────────────────────────── */}
-      <DateTimePicker
-        isOpen={dtpOpen}
-        onClose={() => setDtpOpen(false)}
-        onConfirm={handleDtpConfirm}
-        currentValue={formatDtpValue(selDate, selHour, selMin, selAMPM)}
-      />
-    </div>
-
-    {/* ── FAB lives outside the scroll area so it stays fixed ── */}
-    <button className="hs-fab" aria-label="Call support">
-      <img src={CALL_ICON} alt="" className="hs-fab-icon" />
-    </button>
-
     </div>
   );
 }

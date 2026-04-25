@@ -86,23 +86,20 @@
   white-space: nowrap;
 }
 
-/* Figma: ~12px × icon, no container bg — tap target slightly larger */
+/* Bigger tap target than the visible icon */
 .np-close {
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: none;
+  background: transparent;
   border: none;
-  padding: 4px;
+  border-radius: 50%;
+  cursor: pointer;
   flex-shrink: 0;
 }
-
-/* Figma: size-[11.667px] close icon */
-.np-close-img {
-  width: 11.667px;
-  height: 11.667px;
-  display: block;
-}
+.np-close:active { background: #f3f4f6; }
 
 /* Figma: 1px divider rgba(120,120,120,0.2), inside px-[20px] ctx */
 .np-divider {
@@ -121,18 +118,35 @@
 .np-list::-webkit-scrollbar { display: none; }
 
 /* ── Card ───────────────────────────────────────────────────────── */
-/* Figma read:   bg white,   border-bottom 1px rgba(116,116,128,0.08) */
-/* Figma unread: bg #fcf4f2, border-bottom 2px #ff6038               */
+/* Read:   plain white, hairline divider                            */
+/* Unread: faint orange tint + leading orange marker dot            */
 .np-item {
+  position: relative;
+  width: 100%;
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 12px 16px;
+  padding: 14px 20px;
+  border: none;
+  background: transparent;
+  text-align: left;
   border-bottom: 1px solid rgba(116, 116, 128, 0.08);
+  transition: background 0.15s ease;
+  cursor: pointer;
 }
-.np-item--unread {
-  background: #fcf4f2;
-  border-bottom: 2px solid #ff6038;
+.np-item:hover { background: rgba(116, 116, 128, 0.04); }
+.np-item--unread { background: rgba(255, 96, 56, 0.05); }
+.np-item--unread:hover { background: rgba(255, 96, 56, 0.08); }
+
+/* Small marker on the right edge of unread items */
+.np-unread-dot {
+  position: absolute;
+  top: 18px;
+  right: 16px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff6038;
 }
 
 /* Figma: size-[48px], rounded-[122px], p-[12px] — icon content = 24px */
@@ -204,9 +218,16 @@
 
 /* ── Empty ──────────────────────────────────────────────────────── */
 .np-empty {
-  padding: 48px 20px;
-  text-align: center;
+  padding: 80px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.np-empty p {
+  margin: 0;
   font-family: 'Roboto', sans-serif;
   font-size: 14px;
   color: #8e8e93;
+  text-align: center;
 }

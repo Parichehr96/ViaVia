@@ -1,26 +1,36 @@
 import { useApp } from '../context/AppContext';
+import { useT } from '../i18n';
+import { UserIcon, BellIcon } from './Icons';
+import Windmill from './Windmill';
 import './Header.css';
 
-// Figma asset URLs (valid 7 days from Apr 16 2026)
-const USER_ICON   = 'https://www.figma.com/api/mcp/asset/09bf7ea7-9ff3-402f-bc69-48f34d46e602';
-const BELL_ICON   = 'https://www.figma.com/api/mcp/asset/7444be7a-bb09-4257-98fe-fb4956982875';
-
 export default function Header() {
-  const { setProfileOpen, setNotificationsOpen, unreadCount } = useApp();
+  const { setProfileOpen, setNotificationsOpen, unreadCount, activeTab } = useApp();
+  const t = useT();
+  const isHome = activeTab === 'home';
+  // Greet "Hi, John!" — split so we can keep the bolded name span
+  const greetingParts = t('header.greeting', { name: '__NAME__' }).split('__NAME__');
 
   return (
-    <header className="header-pill-wrapper">
+    <header className={`header-pill-wrapper tab-${activeTab}${isHome ? ' home' : ''}`}>
+      {/* Rotating windmill — bleeds out top-right on every tab */}
+      <div className="header-windmill">
+        <Windmill />
+      </div>
+
       <div className="header-pill">
         {/* Left: avatar + name */}
         <button className="header-left" onClick={() => setProfileOpen(true)}>
           <div className="header-avatar">
-            <img src={USER_ICON} alt="User" className="header-avatar-img" />
+            <UserIcon size={24} style={{ color: '#232d2d' }} />
           </div>
           <div className="header-name-block">
             <p className="header-name">
-              Hi, <span className="header-name-bold">John</span>!
+              {greetingParts[0]}
+              <span className="header-name-bold">John</span>
+              {greetingParts[1] || ''}
             </p>
-            <p className="header-role">Verified Driver</p>
+            <p className="header-role">{t('header.role.driver')}</p>
           </div>
         </button>
 
@@ -31,9 +41,15 @@ export default function Header() {
           aria-label="Notifications"
         >
           {unreadCount > 0 && <span className="header-badge" />}
-          <img src={BELL_ICON} alt="Bell" className="header-bell-img" />
+          <BellIcon size={24} style={{ color: '#232d2d' }} />
         </button>
       </div>
+
+      {/* Tagline — only on Ride (home) tab; the others use the same teal hero */}
+      {isHome && (
+        <p className="header-tagline">{t('header.tagline')}</p>
+      )}
+      {!isHome && <div className="header-spacer" aria-hidden="true" />}
     </header>
   );
 }

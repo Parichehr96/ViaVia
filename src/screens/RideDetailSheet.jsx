@@ -1,19 +1,13 @@
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { ChevronLeft } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Polyline } from 'react-leaflet';
 import { useApp } from '../context/AppContext';
+import { useT } from '../i18n';
+import {
+  BellIcon, MapPinIcon, ClockIcon, EuroIcon, VerifiedIcon,
+  CheckIcon, ChevronLeftIcon, MessageIcon,
+} from '../components/Icons';
 import './RideDetailSheet.css';
-
-// ── Figma asset URLs — refreshed from node 173:5665 (current session) ──
-// Using same assets as CommunityScreen for perfect consistency
-const ICO_BELL    = 'https://www.figma.com/api/mcp/asset/59948073-7e06-4ba2-a680-5f416f59ded3';
-const ICO_PICKUP  = 'https://www.figma.com/api/mcp/asset/73339414-d5fd-40dc-8756-da25060169ee';
-const ICO_DROPOFF = 'https://www.figma.com/api/mcp/asset/f3c3fc92-14f9-47a4-b01a-63899fe5d8fb';
-const ICO_COST    = 'https://www.figma.com/api/mcp/asset/cce1de4c-4758-4736-89fd-aa21379c1f50';
-const ICO_TIME    = 'https://www.figma.com/api/mcp/asset/b85189da-355f-4f9f-b48e-f5df2fdd99ec';
-const VERIFIED_ICO = 'https://www.figma.com/api/mcp/asset/d36eaba8-d17f-4096-b214-819269c26718';
-const CHECK_ICO   = 'https://www.figma.com/api/mcp/asset/15951bfa-cb8e-4c91-8054-99fda47a1d09';
 
 // ── Custom map pin icons ─────────────────────────────────────────
 const makePinIcon = (color) => L.divIcon({
@@ -44,6 +38,7 @@ export default function RideDetailSheet() {
     openDriverRide,
     openChat,
   } = useApp();
+  const t = useT();
 
   const isOpen = selectedRide !== null;
 
@@ -71,12 +66,12 @@ export default function RideDetailSheet() {
           {/* HEADER */}
           <div className="rds-header">
             <div className="rds-header-pill">
-              <button className="rds-back-btn" onClick={closeRideDetail}>
-                <ChevronLeft size={18} strokeWidth={2.2} color="#1a1a1a" />
+              <button className="rds-back-btn" onClick={closeRideDetail} aria-label={t('common.back')}>
+                <ChevronLeftIcon size={20} style={{ color: '#1a1a1a' }} />
               </button>
-              <span className="rds-header-title">Ride Details</span>
-              <button className="rds-bell-btn">
-                <img src={ICO_BELL} alt="" className="rds-bell-ico" />
+              <span className="rds-header-title">{t('rds.title')}</span>
+              <button className="rds-bell-btn" aria-label={t('notif.title')}>
+                <BellIcon size={20} style={{ color: '#1a1a1a' }} />
               </button>
             </div>
           </div>
@@ -139,12 +134,14 @@ export default function RideDetailSheet() {
                 </div>
                 {selectedRide.verified && (
                   <div className="rds-verified-row">
-                    <img src={VERIFIED_ICO} alt="" className="rds-verified-ico" />
-                    <span className="rds-verified-text">Verified Member</span>
+                    <VerifiedIcon size={14} style={{ color: '#ff6038' }} />
+                    <span className="rds-verified-text">{t('rds.verifiedMember')}</span>
                   </div>
                 )}
                 {selectedRide.communities && (
-                  <span className="rds-communities">{selectedRide.communities} shared communities</span>
+                  <span className="rds-communities">
+                    {t('rds.sharedCommunities', { n: selectedRide.communities })}
+                  </span>
                 )}
               </div>
             </div>
@@ -153,23 +150,29 @@ export default function RideDetailSheet() {
             <div className="rds-info-card">
               {/* Pickup */}
               <div className="rds-info-row">
-                <img src={ICO_PICKUP} alt="" className="rds-info-icon" />
+                <span className="rds-info-icon-slot rds-info-icon-pickup">
+                  <MapPinIcon size={20} style={{ color: '#ff6038' }} />
+                </span>
                 <p className="rds-info-text">
-                  <span className="rds-info-bold">Pickup: </span>
+                  <span className="rds-info-bold">{t('rds.pickup')} </span>
                   {selectedRide.pickup}
                 </p>
               </div>
               {/* Dropoff */}
               <div className="rds-info-row">
-                <img src={ICO_DROPOFF} alt="" className="rds-info-icon" />
+                <span className="rds-info-icon-slot rds-info-icon-dropoff">
+                  <MapPinIcon size={20} style={{ color: '#2e3b3b' }} />
+                </span>
                 <p className="rds-info-text">
-                  <span className="rds-info-bold">Drop-off: </span>
+                  <span className="rds-info-bold">{t('rds.dropoff')} </span>
                   {selectedRide.dropoff}
                 </p>
               </div>
               {/* Time */}
               <div className="rds-info-row">
-                <img src={ICO_TIME} alt="" className="rds-info-icon" />
+                <span className="rds-info-icon-slot">
+                  <ClockIcon size={20} style={{ color: '#1a1a1a' }} />
+                </span>
                 <p className="rds-info-text">
                   {selectedRide.time}
                   {selectedRide.duration && (
@@ -179,11 +182,13 @@ export default function RideDetailSheet() {
               </div>
               {/* Cost — always shown */}
               <div className="rds-info-row">
-                <img src={ICO_COST} alt="" className="rds-info-icon" />
-                <p className="rds-info-text">{selectedRide.price || 'Free (community ride)'}</p>
+                <span className="rds-info-icon-slot">
+                  <EuroIcon size={20} style={{ color: '#1a1a1a' }} />
+                </span>
+                <p className="rds-info-text">{selectedRide.price || t('rds.free')}</p>
               </div>
               {/* Pickup note */}
-              <p className="rds-pickup-note">Exact pickup shared after confirmation</p>
+              <p className="rds-pickup-note">{t('rds.pickupNote')}</p>
             </div>
 
             {/* Action button — hidden when viewing own ride */}
@@ -191,24 +196,22 @@ export default function RideDetailSheet() {
               isAccepted
                 ? (
                   <>
-                    <button
-                      className="rds-chat-btn"
-                      onClick={openChat}
-                    >
-                      💬 Chat with Passenger
+                    <button className="rds-chat-btn" onClick={openChat}>
+                      <MessageIcon size={20} style={{ color: '#e85733' }} />
+                      <span>{t('rds.chat')}</span>
                     </button>
                     <button
                       className="rds-start-btn"
                       onClick={() => { openDriverRide(selectedRide); closeRideDetail(); }}
                     >
-                      <img src={CHECK_ICO} alt="" className="rds-accepted-check" />
-                      <span className="rds-start-btn-text">Start Ride</span>
+                      <CheckIcon size={20} style={{ color: '#ffffff' }} />
+                      <span className="rds-start-btn-text">{t('rds.startRide')}</span>
                     </button>
                   </>
                 )
                 : (
                   <button className="rds-accept-btn" onClick={handleAccept}>
-                    <span className="rds-accept-btn-text">Accept Ride</span>
+                    <span className="rds-accept-btn-text">{t('rds.acceptRide')}</span>
                   </button>
                 )
             )}

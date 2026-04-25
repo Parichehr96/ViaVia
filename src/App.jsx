@@ -1,5 +1,6 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
+import { I18nProvider } from './i18n';
 import Header from './components/Header';
 import BottomNav from './components/BottomNav';
 import ProfilePanel from './components/ProfilePanel';
@@ -12,6 +13,7 @@ import RideDetailSheet from './screens/RideDetailSheet';
 import PassengerRideScreen from './screens/PassengerRideScreen';
 import DriverRideScreen from './screens/DriverRideScreen';
 import RideChatSheet from './screens/RideChatSheet';
+import CallScreen from './screens/CallScreen';
 import './index.css';
 
 // ── Status Toast ─────────────────────────────────────────────────────────────
@@ -40,7 +42,7 @@ function StatusToast() {
 
 // ── Ride Toast ───────────────────────────────────────────────────────────────
 function RideToast() {
-  const { rideToast, clearRideToast, setActiveTab } = useApp();
+  const { rideToast, clearRideToast } = useApp();
 
   // Auto-dismiss after 4 s
   useEffect(() => {
@@ -51,25 +53,17 @@ function RideToast() {
 
   if (!rideToast) return null;
 
-  function handleView() {
-    clearRideToast();
-    setActiveTab('community');
-  }
-
   return (
     <div className="ride-toast">
       <div className="ride-toast-content">
         <div className="ride-toast-icon">✓</div>
         <div className="ride-toast-text">
-          <p className="ride-toast-title">Request added to community</p>
+          <p className="ride-toast-title">Ride request submitted successfully</p>
           <p className="ride-toast-sub">
-            {rideToast.from} → {rideToast.to}
+            We'll let you know when someone accepts your ride.
           </p>
         </div>
       </div>
-      <button className="ride-toast-cta" onClick={handleView}>
-        View
-      </button>
     </div>
   );
 }
@@ -153,6 +147,7 @@ function AppShell() {
       <PassengerRideScreen />
       <DriverRideScreen />
       <RideChatSheet />
+      <CallScreen />
       <RideToast />
       <StatusToast />
     </div>
@@ -161,8 +156,10 @@ function AppShell() {
 
 export default function App() {
   return (
-    <AppProvider>
-      <AppShell />
-    </AppProvider>
+    <I18nProvider>
+      <AppProvider>
+        <AppShell />
+      </AppProvider>
+    </I18nProvider>
   );
 }

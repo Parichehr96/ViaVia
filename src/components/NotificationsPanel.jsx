@@ -1,71 +1,67 @@
 import { useApp } from '../context/AppContext';
+import { useT } from '../i18n';
+import { CarIcon, CreditCardIcon, BellIcon, CloseIcon } from './Icons';
 import './NotificationsPanel.css';
 
-// ── Figma asset URLs (node 211:5902) ─────────────────────────────
-// Close X icon — Figma: size-[11.667px], sits next to "Mark all read" with gap-[20px]
-const CLOSE_ICO = 'https://www.figma.com/api/mcp/asset/cd9caee5-4bae-41e3-b68b-778d9f199827';
-// Ride notification icon (directions_car) — shown in #f7e3de circle
-const CAR_ICO   = 'https://www.figma.com/api/mcp/asset/74d87367-a156-4e62-a05b-f2b156691569';
-// Wallet notification icon (credit_card) — shown in rgba(52,199,89,0.12) circle
-const CARD_ICO  = 'https://www.figma.com/api/mcp/asset/0c752af6-3dff-4750-bc53-e0878567ea90';
-
-// Figma: ride → #f7e3de (primary/10), wallet → rgba(52,199,89,0.12) green tint
+// Per-type styling: which icon, what tint behind it
 const TYPE_META = {
-  ride:   { src: CAR_ICO,  bg: '#f7e3de'              },
-  wallet: { src: CARD_ICO, bg: 'rgba(52,199,89,0.12)' },
-  system: { src: CAR_ICO,  bg: '#f5f5f5'              },
+  ride:   { Icon: CarIcon,        bg: '#f7e3de',              color: '#e85733' },
+  wallet: { Icon: CreditCardIcon, bg: 'rgba(52,199,89,0.12)', color: '#1f9b4a' },
+  system: { Icon: BellIcon,       bg: '#f1f3f4',              color: '#1a1a1a' },
 };
 
 export default function NotificationsPanel() {
-  const { notificationsOpen, setNotificationsOpen, notifications, markAllRead } = useApp();
+  const {
+    notificationsOpen, setNotificationsOpen, notifications, markAllRead,
+  } = useApp();
+  const t = useT();
+
+  const close = () => setNotificationsOpen(false);
 
   return (
     <>
       <div
         className={`np-overlay${notificationsOpen ? ' visible' : ''}`}
-        onClick={() => setNotificationsOpen(false)}
+        onClick={close}
       />
 
       <aside className={`np-panel${notificationsOpen ? ' open' : ''}`}>
 
         {/* ── Header ──────────────────────────────────────── */}
-        {/* Figma: px-[20px] py-[22px], flex row: title + [mark-read + X icon gap-20px] */}
         <div className="np-header">
-          <p className="np-title">Notifications</p>
-          {/* Figma: gap-[20px] between "Mark all read" text and the X close icon */}
+          <p className="np-title">{t('notif.title')}</p>
           <div className="np-header-right">
             <button className="np-mark-read" onClick={markAllRead}>
-              Mark all read
+              {t('notif.markAllRead')}
             </button>
-            {/* Figma: close icon size-[11.667px] */}
-            <button
-              className="np-close"
-              onClick={() => setNotificationsOpen(false)}
-              aria-label="Close"
-            >
-              <img src={CLOSE_ICO} alt="" className="np-close-img" />
+            <button className="np-close" onClick={close} aria-label={t('common.close')}>
+              <CloseIcon size={18} style={{ color: '#1a1a1a' }} />
             </button>
           </div>
         </div>
 
-        {/* Figma: 1px divider rgba(120,120,120,0.2) */}
         <div className="np-divider" />
 
         {/* ── List ────────────────────────────────────────── */}
         <div className="np-list">
           {notifications.length === 0 ? (
-            <p className="np-empty">No notifications yet</p>
+            <div className="np-empty">
+              <BellIcon size={36} style={{ color: '#c9c9c9' }} />
+              <p>{t('notif.empty')}</p>
+            </div>
           ) : (
-            notifications.map(n => {
+            notifications.map((n) => {
               const meta = TYPE_META[n.type] ?? TYPE_META.system;
+              const Icon = meta.Icon;
               return (
-                <div key={n.id} className={`np-item${!n.read ? ' np-item--unread' : ''}`}>
-                  {/* Icon circle — Figma: 48px, p-[12px], rounded-[122px] */}
+                <button
+                  key={n.id}
+                  type="button"
+                  className={`np-item${!n.read ? ' np-item--unread' : ''}`}
+                >
                   <div className="np-icon-wrap" style={{ background: meta.bg }}>
-                    <img src={meta.src} alt="" className="np-icon-img" />
+                    <Icon size={22} style={{ color: meta.color }} />
                   </div>
-
-                  {/* Content */}
                   <div className="np-body">
                     <div className="np-body-row">
                       <p className="np-item-title">{n.title}</p>
@@ -73,7 +69,8 @@ export default function NotificationsPanel() {
                     </div>
                     <p className="np-item-desc">{n.desc}</p>
                   </div>
-                </div>
+                  {!n.read && <span className="np-unread-dot" aria-hidden="true" />}
+                </button>
               );
             })
           )}

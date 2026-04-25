@@ -1,355 +1,320 @@
 /* ══════════════════════════════════════════════════════════════════
-   WalletScreen — pixel-perfect match to Figma node 167:7594
+   WalletScreen — Figma 83:21317 (resting) + 123:22139 (scrolled).
+   Hero is sticky and collapses on scroll: dark balance card → inline
+   compact line; action row hides; offers list pulls up underneath.
    ══════════════════════════════════════════════════════════════════ */
-
-.ws-wrapper {
-  flex: 1;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  background: #f5f5f5;
-}
 
 .ws-root {
   flex: 1;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  background: #f5f5f5;
+  overflow-y: auto;
+  overflow-x: hidden;
   scrollbar-width: none;
+  background: #e0eaeb;
+  min-height: 0;
+  /* Vertical offset for the sticky offers header — must match the
+     collapsed height of .ws-hero (44 px content + ~12 px padding). */
+  --hero-collapsed-h: 56px;
 }
 .ws-root::-webkit-scrollbar { display: none; }
 
-/* ── Hero: white card, rounded bottom ──────────────────────────── */
-/* Figma: bg-white rounded-bl-[44px] rounded-br-[44px] */
+/* ── Sticky hero (balance + actions) ─────────────────────────── */
 .ws-hero {
-  background: #ffffff;
-  border-radius: 0 0 44px 44px;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  flex-shrink: 0;
+  padding: 4px 20px 16px;
+  background: #ffffff;        /* white extends down from the header */
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  padding: 20px;
-  flex-shrink: 0;
-  position: relative;
-  z-index: 0;
+  gap: 12px;
+  /* Smooth shape change as `.scrolled` toggles */
+  transition: padding 0.24s ease, background 0.24s ease;
+}
+.ws-hero.scrolled {
+  background: #e0eaeb;        /* match offers bg in collapsed state */
+  padding: 4px 20px 8px;
 }
 
-/* ── Credit balance ────────────────────────────────────────────── */
+/* ── Dark balance card (resting) ─────────────────────────────── */
 .ws-balance-card {
-  width: 100%;
-  border-radius: 24px;
-  padding: 16px;
+  background: #2e3b3b;
+  border-radius: 18px;
+  padding: 18px 16px;
+  color: #ffffff;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  /* Figma: conic-gradient from #f5f5f5 → #e8f0f0 → #f5f5f5 */
-  background: conic-gradient(from 90deg at 50% 50%, #f5f5f5 0%, #e8f0f0 30%, #f5f5f5 100%);
+  /* Animated to a transparent inline strip on scroll */
+  transition:
+    background 0.24s ease,
+    padding    0.24s ease,
+    border-radius 0.24s ease,
+    gap 0.24s ease;
+}
+.ws-hero.scrolled .ws-balance-card {
+  background: transparent;
+  padding: 4px 0;
+  border-radius: 0;
+  gap: 12px;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: flex-start;
 }
 
 .ws-balance-label {
-  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
-  letter-spacing: 0.1px;
-  color: #1a1a1a;
+  color: #ffffff;
   text-align: center;
+  letter-spacing: 0.2px;
+  transition: font-size 0.24s ease, color 0.24s ease;
 }
-
-.ws-balance-amount {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-
-.ws-vv {
-  font-family: 'Roboto', sans-serif;
-  font-size: 24px;
-  font-weight: 400;
-  line-height: 32px;
-  color: #000;
+.ws-hero.scrolled .ws-balance-label {
+  font-size: 13px;
+  color: #1a1a1a;
 }
 
 .ws-amount {
-  font-family: 'Roboto', sans-serif;
-  font-size: 32px;
+  margin: 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 36px;
   font-weight: 700;
-  line-height: 40px;
-  color: #000;
+  line-height: 1.05;
+  letter-spacing: -0.5px;
+  color: #ffffff;
+  transition: font-size 0.24s ease, color 0.24s ease;
+}
+.ws-hero.scrolled .ws-amount {
+  font-size: 22px;
+  color: #1a1a1a;
 }
 
 .ws-balance-sub {
-  font-family: 'Roboto', sans-serif;
-  font-size: 14px;
+  margin: 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 13px;
   font-weight: 500;
-  line-height: 20px;
+  line-height: 18px;
+  color: rgba(255, 255, 255, 0.78);
   letter-spacing: 0.1px;
-  color: #1a1a1a;
-  text-align: center;
+  transition: color 0.24s ease, font-size 0.24s ease;
+}
+.ws-hero.scrolled .ws-balance-sub {
+  color: #727272;
+  font-size: 12px;
 }
 
-/* ── Action buttons ────────────────────────────────────────────── */
-.ws-actions {
+/* ── Action row (hides on scroll) ────────────────────────────── */
+.ws-actions-row {
   display: flex;
-  gap: 20px;
   align-items: flex-start;
-  flex-shrink: 0;
+  justify-content: space-around;
+  gap: 12px;
+  padding: 4px 8px 0;
+  max-height: 96px;
+  opacity: 1;
+  overflow: hidden;
+  transition: max-height 0.24s ease, opacity 0.18s ease, padding 0.24s ease;
+}
+.ws-hero.scrolled .ws-actions-row {
+  max-height: 0;
+  opacity: 0;
+  padding: 0;
 }
 
-.ws-action-btn {
+.ws-action {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  width: 102px;
-  padding: 12px 0;
-  background: none;
+  gap: 6px;
+  background: transparent;
   border: none;
   cursor: pointer;
-  border-radius: 20px;
-  transition: background 0.15s;
 }
-
-.ws-action-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 44px;
-  background: #f7e3de; /* --primary/10 */
-  display: flex;
+.ws-action-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid rgba(120, 120, 120, 0.18);
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 }
-
-.ws-action-icon--tx {
-  flex-direction: row;
-  gap: 0;
-  padding: 0 6px;
-}
-
-.ws-action-img {
-  width: 14px;
-  height: 14px;
-  display: block;
-}
-
 .ws-action-label {
-  font-family: 'Roboto', sans-serif;
-  font-size: 14px;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 13px;
   font-weight: 500;
-  line-height: 20px;
+  line-height: 18px;
+  color: #1a1a1a;
   letter-spacing: 0.1px;
-  color: #727272;
-  text-align: center;
-  white-space: nowrap;
 }
 
-/* ── Offers section ────────────────────────────────────────────── */
-/* Overlaps the hero by 20px so it "slides over" it when scrolled  */
-.ws-offers {
-  display: flex;
-  flex-direction: column;
-  margin-top: -20px;          /* pull up over the hero's rounded bottom */
-  border-radius: 20px 20px 0 0;
-  background: #f5f5f5;
-  position: relative;
-  z-index: 1;
-  padding: 0 16px 96px;
-}
-
-/* ── Sticky header: title + chips ──────────────────────────────── */
-.ws-offers-head {
+/* ══════════════════════════════════════════════════════════════════
+   Sticky offers header — title + chips. Sits right under the hero.
+   ══════════════════════════════════════════════════════════════════ */
+.ws-offers-header {
   position: sticky;
-  top: 0;
-  z-index: 10;
-  background: #f5f5f5;
-  padding-top: 20px;
-  padding-bottom: 12px;
+  /* In collapsed state this stays just under the (now-44 px) hero. */
+  top: var(--hero-collapsed-h, 56px);
+  z-index: 5;
+  flex-shrink: 0;
+  background: #e0eaeb;       /* matches the deals-list bg */
+  padding: 16px 16px 12px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  /* Subtle bottom shadow appears once stuck so cards don't touch the chips */
+  transition: box-shadow 0.18s ease;
+}
+.ws-offers-header.scrolled {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
 }
 
 .ws-offers-title {
-  font-family: 'Roboto', sans-serif;
+  margin: 0 4px;
+  font-family: 'Inter', 'Roboto', sans-serif;
   font-size: 22px;
-  font-weight: 400;
+  font-weight: 600;
   line-height: 28px;
-  color: #000;
-  white-space: nowrap;
+  color: #1a1a1a;
+  letter-spacing: 0.1px;
 }
 
-/* ── Filter chips ──────────────────────────────────────────────── */
+/* Chip row */
 .ws-chips-row {
   display: flex;
   gap: 8px;
-  align-items: center;
   overflow-x: auto;
-  flex-shrink: 0;
   scrollbar-width: none;
+  margin: 0 -16px;
+  padding: 0 16px;
 }
 .ws-chips-row::-webkit-scrollbar { display: none; }
 
 .ws-chip {
-  padding: 12px 24px;
-  border-radius: 22px;
-  border: none;
-  cursor: pointer;
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 24px;
-  letter-spacing: 0.15px;
-  white-space: nowrap;
-  background: #ffffff;
-  color: #49454f;
-  transition: background 0.15s, color 0.15s;
   flex-shrink: 0;
+  background: #ffffff;
+  border: 1px solid rgba(120, 120, 120, 0.18);
+  border-radius: 22px;
+  padding: 8px 22px;
+  height: 38px;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 22px;
+  color: #49454f;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 .ws-chip.active {
-  background: #e85733;
-  color: #f3f3f3;
+  background: #ff6038;
+  color: #ffffff;
+  border-color: #ff6038;
 }
 
-/* ── Deal cards ────────────────────────────────────────────────── */
-.ws-deals {
+/* ── Deal cards ──────────────────────────────────────────── */
+.ws-deals-list {
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
+  padding: 0 16px 24px;
 }
 
 .ws-deal-card {
   background: #ffffff;
-  border-radius: 8px;
-  padding: 16px;
+  border-radius: 14px;
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  flex-shrink: 0;
 }
 
 .ws-deal-top {
   display: flex;
-  gap: 8px;
   align-items: center;
+  gap: 12px;
 }
-
-.ws-deal-img {
-  width: 60px;
-  height: 60px;
+.ws-deal-image {
+  width: 56px;
+  height: 56px;
   border-radius: 8px;
-  object-fit: cover;
   flex-shrink: 0;
-  background: #e5e7eb;
-  display: block;
+  background:
+    repeating-conic-gradient(#d9d9d9 0 25%, #f0f0f0 0 50%) 0 0 / 14px 14px;
 }
-
-.ws-deal-info {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
+.ws-deal-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .ws-deal-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
 }
-
 .ws-deal-name {
-  font-family: 'Roboto', sans-serif;
+  flex: 1;
+  font-family: 'Inter', 'Roboto', sans-serif;
   font-size: 16px;
   font-weight: 600;
-  line-height: 24px;
-  letter-spacing: 0.15px;
-  color: #49454f;
-  flex: 1;
+  line-height: 22px;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-
 .ws-deal-time {
-  font-family: 'Roboto', sans-serif;
-  font-size: 14px;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 13px;
   font-weight: 500;
-  line-height: 20px;
+  line-height: 18px;
   color: #8e8e93;
   white-space: nowrap;
-  flex-shrink: 0;
 }
-
 .ws-deal-desc {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Inter', 'Roboto', sans-serif;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 20px;
-  letter-spacing: 0.1px;
   color: #49454f;
-  white-space: nowrap;
 }
 
 .ws-deal-divider {
-  width: 100%;
   height: 1px;
-  background: rgba(120, 120, 120, 0.2);
+  background: rgba(120, 120, 120, 0.18);
 }
 
 .ws-deal-footer {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   gap: 8px;
 }
-
 .ws-deal-credits {
-  font-family: 'Roboto', sans-serif;
+  flex: 1;
+  font-family: 'Inter', 'Roboto', sans-serif;
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
-  color: #49454f;
-  flex: 1;
+  color: #1a1a1a;
 }
-
 .ws-redeem-btn {
-  background: #f7e3de;
-  border: none;
-  border-radius: 8px;
-  padding: 12px;
-  cursor: pointer;
+  background: transparent;
+  border: 1px solid rgba(120, 120, 120, 0.22);
+  border-radius: 10px;
+  padding: 8px 18px;
   font-family: 'Inter', 'Roboto', sans-serif;
   font-size: 14px;
   font-weight: 600;
-  color: #ff6038;
-  white-space: nowrap;
-  transition: background 0.15s;
-}
-
-/* ── FAB ───────────────────────────────────────────────────────── */
-.ws-fab {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  width: 72px;
-  height: 72px;
-  border-radius: 44px;
-  background: #ff6038;
-  border: none;
+  line-height: 1;
+  color: #e85733;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0px 6px 10px rgba(0,0,0,0.15), 0px 2px 3px rgba(0,0,0,0.3);
-  transition: transform 0.15s;
-  z-index: 20;
+  transition: background 0.15s ease;
 }
-.ws-fab:active { transform: scale(0.96); }
-
-.ws-fab-icon {
-  width: 32px;
-  height: 32px;
-  display: block;
-  filter: brightness(0) invert(1);
-}
+.ws-redeem-btn:hover { background: rgba(232, 87, 51, 0.06); }

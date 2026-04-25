@@ -1,311 +1,361 @@
 /* ══════════════════════════════════════════════════════════════════
-   DriverRideScreen — slide-up overlay, z-index 350
+   DriverRideScreen — Bolt-style during-ride flow.
+   Full-screen live map underneath, floating top bar, bottom sheet
+   with passenger / route / stats / status-driven CTA.
    ══════════════════════════════════════════════════════════════════ */
 
 .drs-overlay {
   position: absolute;
   inset: 0;
   z-index: 350;
-  display: flex;
-  flex-direction: column;
   background: #f5f5f5;
-  transform: translateY(100%);
-  visibility: hidden;
-  transition: transform 0.32s cubic-bezier(0.55, 0, 1, 0.45),
-              visibility 0s linear 0.32s;
+  overflow: hidden;
+  animation: drs-rise 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes drs-rise {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0);    }
+}
+
+/* ── Map layer fills the whole panel; bottom sheet sits over it ── */
+.drs-map {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.drs-map .leaflet-container { background: #cfd8d8; }
+
+/* ── Floating top bar ──────────────────────────────────────── */
+.drs-top {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   pointer-events: none;
 }
+.drs-top > * { pointer-events: auto; }
 
-.drs-overlay.open {
-  transform: translateY(0);
-  visibility: visible;
-  pointer-events: all;
-  transition: transform 0.48s cubic-bezier(0.16, 1, 0.3, 1),
-              visibility 0s linear 0s;
-}
-
-/* ── Header ─────────────────────────────────────────────────────── */
-.drs-header {
-  flex-shrink: 0;
-  padding: 8px 16px;
-}
-
-.drs-header-pill {
+.drs-icon-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
   background: #ffffff;
-  border: 0.6px solid #e8f0f0;
-  border-radius: 122px;
+  border: none;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 8px;
-  gap: 8px;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
 }
+.drs-icon-btn:active { background: #f3f4f6; }
 
-.drs-header-title {
-  font-family: 'Inter', sans-serif;
-  font-size: 16px;
-  font-weight: 500;
-  color: #1e1e1e;
+.drs-status-pill {
   flex: 1;
+  min-width: 0;
+  background: #ffffff;
+  border-radius: 100px;
+  padding: 11px 18px;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
   text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.drs-back-btn {
-  background: #f5f5f5;
-  border: 1.2px solid #ffffff;
-  border-radius: 122px;
-  padding: 7px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.drs-bell-btn {
-  background: #f5f5f5;
-  border: 1.2px solid #ffffff;
-  border-radius: 122px;
-  padding: 7px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.drs-bell-ico {
-  width: 18px;
-  height: 18px;
-  display: block;
-}
-
-/* ── Scrollable content ─────────────────────────────────────────── */
-.drs-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  scrollbar-width: none;
-  padding-bottom: 80px;
-}
-
-.drs-content::-webkit-scrollbar {
-  display: none;
-}
-
-/* ── Card ───────────────────────────────────────────────────────── */
-.drs-card {
+/* ── Bottom sheet ──────────────────────────────────────────── */
+.drs-sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
   background: #ffffff;
-  border-radius: 20px;
-  padding: 16px;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  padding: 8px 20px 20px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
+  box-shadow: 0 -16px 40px rgba(0, 0, 0, 0.18);
+  animation: drs-sheet-rise 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes drs-sheet-rise {
+  from { transform: translateY(40px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.drs-sheet-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 4px;
+  background: #d1d5d9;
+  margin: 0 auto;
 }
 
-/* ── Passenger info ─────────────────────────────────────────────── */
-.drs-passenger-row {
+/* ── Passenger row ─────────────────────────────────────────── */
+.drs-pax {
   display: flex;
   align-items: center;
   gap: 12px;
 }
-
-.drs-avatar-container {
-  background: rgba(116, 116, 128, 0.08);
-  border-radius: 1222px;
-  padding: 12px;
+.drs-pax-photo {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #d1d5d9;
+  flex-shrink: 0;
+  display: block;
+}
+.drs-pax-fallback {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #d1d5d9;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
   flex-shrink: 0;
 }
-
-.drs-avatar-ico {
-  width: 32px;
-  height: 32px;
-  display: block;
-}
-
-.drs-passenger-info {
+.drs-pax-info {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
-
-.drs-passenger-name {
-  font-family: 'Roboto', sans-serif;
+.drs-pax-name {
+  margin: 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
   font-size: 16px;
   font-weight: 600;
-  color: #000000;
+  color: #1a1a1a;
   letter-spacing: 0.15px;
-  line-height: 24px;
+}
+.drs-pax-sub {
+  margin: 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #727272;
 }
 
-.drs-verified-row {
+.drs-mini-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f1f3f4;
+  border: none;
+  cursor: pointer;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+.drs-mini-btn:hover { background: #e6e9ea; }
+.drs-mini-btn:active { background: #d9dde0; }
+
+.drs-divider {
+  height: 1px;
+  background: #ececec;
+}
+
+/* ── Route block ───────────────────────────────────────────── */
+.drs-route {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+}
+.drs-route-pins {
+  flex-shrink: 0;
+  width: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 0;
+}
+.drs-route-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #ff6038;
+  background: #ffffff;
+}
+.drs-route-dot.drop {
+  background: #ff6038;
+}
+.drs-route-line {
+  flex: 1;
+  width: 2px;
+  background: repeating-linear-gradient(
+    to bottom,
+    #ff6038 0 3px,
+    transparent 3px 6px
+  );
+  margin: 2px 0;
+  min-height: 14px;
+}
+.drs-route-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 2px 0;
+}
+.drs-route-place {
+  margin: 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Trip stats ────────────────────────────────────────────── */
+.drs-stats {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-top: 4px;
+}
+.drs-stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+/* ── Primary CTA ───────────────────────────────────────────── */
+.drs-primary {
+  height: 56px;
+  border: none;
+  border-radius: 28px;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.12s ease;
+}
+.drs-primary:active { transform: scale(0.99); }
+.drs-primary-orange {
+  background: #ff6038;
+  color: #ffffff;
+}
+.drs-primary-orange:hover { background: #ef5a34; }
+.drs-primary-dark {
+  background: #2e3b3b;
+  color: #f5f5f5;
+}
+.drs-primary-dark:hover { background: #3a4848; }
+
+/* ── Cancel — destructive secondary ────────────────────────── */
+.drs-cancel {
+  height: 44px;
+  background: transparent;
+  border: none;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #b32e1f;
+  cursor: pointer;
+}
+.drs-cancel:active { color: #8e1e15; }
+
+/* ── Trip summary (shown after "I've arrived") ────────────── */
+.drs-summary {
+  align-items: stretch;
+  text-align: left;
+  padding-top: 28px;
+}
+.drs-summary-check {
+  align-self: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #ff6038;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(255, 96, 56, 0.3);
+}
+.drs-summary-title {
+  margin: 0;
+  text-align: center;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+.drs-summary-sub {
+  margin: -4px 0 8px;
+  text-align: center;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 14px;
+  color: #727272;
+}
+
+/* Re-use the same pickup/drop pin pattern from the live trip route */
+.drs-summary-route {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+  padding: 4px 4px 0;
+}
+
+/* Three-stat row with vertical separators (Bolt-style ride summary) */
+.drs-summary-stats {
+  display: flex;
+  align-items: stretch;
+  background: #f6f7f8;
+  border-radius: 16px;
+  padding: 14px 8px;
+  margin-top: 4px;
+}
+.drs-summary-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 4px;
 }
-
-.drs-verified-ico {
-  width: 14px;
-  height: 14px;
-  display: block;
+.drs-summary-stat-val {
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
 }
-
-.drs-verified-label {
-  font-family: 'Roboto', sans-serif;
+.drs-summary-stat-val.drs-summary-earnings { color: #ff6038; }
+.drs-summary-stat-lbl {
+  font-family: 'Inter', 'Roboto', sans-serif;
   font-size: 12px;
-  font-weight: 400;
-  color: #333333;
-  letter-spacing: 0.4px;
-  line-height: 16px;
+  font-weight: 500;
+  color: #727272;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
 }
-
-/* ── Map ────────────────────────────────────────────────────────── */
-.drs-map-wrap {
-  height: 222px;
-  border-radius: 10px;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.drs-map-wrap .leaflet-container {
-  width: 100%;
-  height: 100%;
-}
-
-/* ── Trip info ──────────────────────────────────────────────────── */
-.drs-trip-info {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.drs-trip-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.drs-trip-ico {
-  width: 24px;
-  height: 24px;
-  display: block;
-  flex-shrink: 0;
-  object-fit: contain;
-}
-
-.drs-trip-text {
-  font-family: 'Inter', sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  color: #1e1e1e;
-  line-height: 1.4;
-  flex: 1;
-}
-
-.drs-fare-text {
-  font-family: 'Inter', sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  color: #1e1e1e;
-  flex: 1;
-}
-
-.drs-time-text {
-  font-family: 'Inter', sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  color: #1e1e1e;
-  flex: 1;
-}
-
-/* ── Status action button ───────────────────────────────────────── */
-.drs-action-status-btn {
-  width: 100%;
-  padding: 14px;
-  border: none;
-  border-radius: 8px;
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.drs-btn-orange {
-  background: #ff6038;
-  color: #ffffff;
-}
-
-.drs-btn-dark {
-  background: #2e3b3b;
-  color: #ffffff;
-}
-
-/* ── Action row ─────────────────────────────────────────────────── */
-.drs-action-row {
-  display: flex;
-  gap: 12px;
-}
-
-.drs-cancel-btn {
-  flex: 1;
-  background: #f5f5f5;
-  border: none;
-  border-radius: 8px;
-  padding: 12px;
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-  font-weight: 600;
-  color: #e85733;
-  cursor: pointer;
-}
-
-.drs-call-btn {
-  flex: 1;
-  background: #ff6038;
-  border: none;
-  border-radius: 8px;
-  padding: 12px;
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-  font-weight: 600;
-  color: #f5f5f5;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.drs-phone-ico {
-  width: 16px;
-  height: 16px;
-  display: block;
-  filter: brightness(0) invert(1);
-}
-
-/* ── Chat FAB ───────────────────────────────────────────────────── */
-.drs-chat-fab {
-  position: absolute;
-  bottom: 80px;
-  right: 20px;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: #ff6038;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(255, 96, 56, 0.4);
-  z-index: 10;
+.drs-summary-stat-sep {
+  width: 1px;
+  background: rgba(120, 120, 120, 0.2);
+  border-radius: 1px;
+  align-self: stretch;
 }
