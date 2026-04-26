@@ -162,6 +162,7 @@ const dictionaries = {
     'rds.acceptRide':         'Accept Ride',
     'rds.startRide':          'Start Ride',
     'rds.chat':               'Chat with Passenger',
+    'rds.chatBefore':         'Chat with {name}',
 
     /* — Driver in-ride flow — */
     'drs.passenger':          'Passenger',
@@ -324,6 +325,7 @@ const dictionaries = {
     'rds.acceptRide':         'Rit accepteren',
     'rds.startRide':          'Rit starten',
     'rds.chat':               'Chat met passagier',
+    'rds.chatBefore':         'Chat met {name}',
 
     'drs.passenger':          'Passagier',
     'drs.call':               'Bel passagier',

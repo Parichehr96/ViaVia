@@ -165,6 +165,48 @@ export function AppProvider({ children }) {
       fromCoords: [52.3525, 4.8978],
       toCoords: [52.4001, 4.9219],
     },
+    {
+      id: 4, name: 'Daan Janssen', initials: 'DJ', communities: 2, verified: true,
+      match: 88, price: '€ 4.20', from: 'Jordaan', to: 'Westerpark',
+      when: 'Today, 6:15 PM', duration: '8 min', distance: '2.5 km',
+      fromCoords: [52.3742, 4.8838], toCoords: [52.3865, 4.8780],
+    },
+    {
+      id: 5, name: 'Iris van Dijk', initials: 'IV', communities: 4, verified: true,
+      match: 95, price: '€ 6.80', from: 'Amsterdam Oost', to: 'Rijksmuseum',
+      when: 'Today, 7:45 PM', duration: '18 min', distance: '6 km',
+      fromCoords: [52.3625, 4.9286], toCoords: [52.3600, 4.8852],
+    },
+    {
+      id: 6, name: 'Nora El Idrissi', initials: 'NE', communities: 6, verified: true,
+      match: 81, price: '€ 11.00', from: 'Amstelveen', to: 'Haarlem Station',
+      when: 'Tomorrow, 7:30 AM', duration: '40 min', distance: '22 km',
+      fromCoords: [52.3081, 4.8595], toCoords: [52.3878, 4.6383],
+    },
+    {
+      id: 7, name: 'Tom Jansen', initials: 'TJ', communities: 1, verified: false,
+      match: 72, price: '€ 2.50', from: 'Centraal Station', to: 'Dam Square',
+      when: 'Today, 9:20 PM', duration: '5 min', distance: '1.2 km',
+      fromCoords: [52.3791, 4.9003], toCoords: [52.3731, 4.8926],
+    },
+    {
+      id: 8, name: 'Anouk Bakker', initials: 'AB', communities: 3, verified: true,
+      match: 90, price: '€ 7.20', from: 'Sloterdijk', to: 'IJburg',
+      when: 'Tomorrow, 11:00 AM', duration: '28 min', distance: '14 km',
+      fromCoords: [52.3886, 4.8378], toCoords: [52.3589, 4.9810],
+    },
+    {
+      id: 9, name: 'Pieter Hofman', initials: 'PH', communities: 2, verified: true,
+      match: 76, price: '€ 5.00', from: 'Olympiaplein', to: 'NEMO Science Museum',
+      when: 'Today, 10:00 PM', duration: '14 min', distance: '5 km',
+      fromCoords: [52.3445, 4.8615], toCoords: [52.3737, 4.9123],
+    },
+    {
+      id: 10, name: 'Mei Tan', initials: 'MT', communities: 4, verified: true,
+      match: 94, price: '€ 9.50', from: 'Zuidas', to: 'Artis Zoo',
+      when: 'Tomorrow, 2:15 PM', duration: '22 min', distance: '9 km',
+      fromCoords: [52.3388, 4.8722], toCoords: [52.3661, 4.9180],
+    },
   ]);
 
   const unreadCount = notifications.filter(n => !n.read).length;

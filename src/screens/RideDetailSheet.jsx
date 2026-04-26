@@ -191,29 +191,33 @@ export default function RideDetailSheet() {
               <p className="rds-pickup-note">{t('rds.pickupNote')}</p>
             </div>
 
-            {/* Action button — hidden when viewing own ride */}
+            {/* Actions — hidden when viewing own ride. Chat button is now
+                shown in BOTH states so the user can message the requester
+                before deciding to accept. */}
             {!selectedRide.isOwn && (
-              isAccepted
-                ? (
-                  <>
-                    <button className="rds-chat-btn" onClick={openChat}>
-                      <MessageIcon size={20} style={{ color: '#e85733' }} />
-                      <span>{t('rds.chat')}</span>
-                    </button>
-                    <button
-                      className="rds-start-btn"
-                      onClick={() => { openDriverRide(selectedRide); closeRideDetail(); }}
-                    >
-                      <CheckIcon size={20} style={{ color: '#ffffff' }} />
-                      <span className="rds-start-btn-text">{t('rds.startRide')}</span>
-                    </button>
-                  </>
-                )
-                : (
+              <>
+                <button className="rds-chat-btn" onClick={openChat}>
+                  <MessageIcon size={20} style={{ color: '#e85733' }} />
+                  <span>
+                    {isAccepted
+                      ? t('rds.chat')
+                      : t('rds.chatBefore', { name: selectedRide.name.split(' ')[0] })}
+                  </span>
+                </button>
+                {isAccepted ? (
+                  <button
+                    className="rds-start-btn"
+                    onClick={() => { openDriverRide(selectedRide); closeRideDetail(); }}
+                  >
+                    <CheckIcon size={20} style={{ color: '#ffffff' }} />
+                    <span className="rds-start-btn-text">{t('rds.startRide')}</span>
+                  </button>
+                ) : (
                   <button className="rds-accept-btn" onClick={handleAccept}>
                     <span className="rds-accept-btn-text">{t('rds.acceptRide')}</span>
                   </button>
-                )
+                )}
+              </>
             )}
           </div>
         </>

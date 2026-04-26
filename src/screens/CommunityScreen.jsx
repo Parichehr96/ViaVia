@@ -210,13 +210,17 @@ export default function CommunityScreen() {
     acceptedRides, acceptRide,
     acceptToast, showAcceptToast, clearAcceptToast,
     openRideDetail,
-    dismissedRides, dismissRide,
+    dismissedRides,
   } = useApp();
 
   // Filter state
   const [whenFilter, setWhenFilter] = useState('any');
   const [distFilter, setDistFilter] = useState(0); // km, 0 = any
-  const [dismissingIds, setDismissingIds] = useState(() => new Set());
+  // Two short-lived sets driving the post-accept fade. After 5 s the ride
+  // disappears from community via `acceptedRides`, but stays in HomeScreen
+  // → I'm Driving until the trip ends and DriverRideScreen dismisses it.
+  const [recentlyAccepted, setRecentlyAccepted] = useState(() => new Set());
+  const [dismissingIds,    setDismissingIds]    = useState(() => new Set());
 
   // Auto-dismiss accept toast after 4 s
   useEffect(() => {
@@ -240,10 +244,13 @@ export default function CommunityScreen() {
     { value: 0,   label: 'Any range' },
   ]), []);
 
-  // Filter pipeline
+  // Filter pipeline. Accepted rides are normally hidden from community —
+  // except during the 5 s `recentlyAccepted` window so the user sees the
+  // visual confirmation + fade-out before the card disappears.
   const visibleRides = rideRequests.filter((r) => {
     if (r.isOwn) return false;
     if (dismissedRides.has(r.id)) return false;
+    if (acceptedRides.has(r.id) && !recentlyAccepted.has(r.id)) return false;
     if (!matchesTime(r, whenFilter)) return false;
     if (distFilter > 0 && r.fromCoords) {
       const km = haversineKm(USER_POS, r.fromCoords);
@@ -253,19 +260,15 @@ export default function CommunityScreen() {
   });
 
   function handleAccept(req) {
-    acceptRide(req.id);
+    acceptRide(req.id);            // adds id to acceptedRides Set
     showAcceptToast({ name: req.name.split(' ')[0] });
-    // Visual fade after 4.5 s, then unmount at 5 s
+    setRecentlyAccepted((s) => new Set([...s, req.id]));
     setTimeout(() => {
       setDismissingIds((s) => new Set([...s, req.id]));
     }, 4500);
     setTimeout(() => {
-      dismissRide(req.id);
-      setDismissingIds((s) => {
-        const n = new Set(s);
-        n.delete(req.id);
-        return n;
-      });
+      setRecentlyAccepted((s) => { const n = new Set(s); n.delete(req.id); return n; });
+      setDismissingIds((s)    => { const n = new Set(s); n.delete(req.id); return n; });
     }, 5000);
   }
 
