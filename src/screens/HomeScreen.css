@@ -1,47 +1,62 @@
 /* ══════════════════════════════════════════════════════════════════
-   HomeScreen (Ride tab) — Figma 82:20266 / 83:20703
-   Profile container: flex-col gap-20, px-20 py-16, overflow-clip
+   HomeScreen (Ride tab) — Figma 138:6789 / 138:7389
+   Single white card holds tab bar + optional request block (sticky)
+   and a scrollable content region. Rides scroll *under* the sticky.
    ══════════════════════════════════════════════════════════════════ */
 
 .hs-root {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 20px;
   padding: 16px 20px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: none;
+  overflow: hidden;            /* the inner card handles scroll */
   background: #e0eaeb;
   min-height: 0;
 }
-.hs-root::-webkit-scrollbar { display: none; }
 
-/* ══════════════════════════════════════════════════════════════════
-   "Need to be anywhere?" card — Figma 82:20601
-   bg white, rounded 16, padding 16, gap 16
-   ══════════════════════════════════════════════════════════════════ */
-.hs-request-card {
+/* The white card fills available height inside .hs-root */
+.hs-card {
+  flex: 1;
   background: #ffffff;
   border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;            /* clips so sticky layout is clean */
+  min-height: 0;
+}
+
+/* Sticky cluster — tab bar (always) + request block (Getting-a-Ride) */
+.hs-card-sticky {
+  flex-shrink: 0;
+  padding: 16px 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background: #ffffff;
+}
+
+/* Request block (only on I'm Getting a Ride) */
+.hs-request-block {
+  border: 1px solid rgba(120, 120, 120, 0.2);
+  border-radius: 20px;
   padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  flex-shrink: 0;
+  gap: 12px;
 }
 
-.hs-card-title {
+.hs-request-title {
+  margin: 0;
   font-family: 'Roboto', sans-serif;
-  font-size: 20px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 300;            /* Roboto Light */
   line-height: 28px;
   color: #1e1e1e;
-  margin: 0;
+  text-align: center;
   letter-spacing: 0;
 }
 
-.hs-cta-group {
+.hs-request-buttons {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -91,31 +106,28 @@
 .hs-cta-secondary:hover  { background: rgba(232, 87, 51, 0.04); }
 .hs-cta-secondary:active { background: rgba(232, 87, 51, 0.10); }
 
-/* ══════════════════════════════════════════════════════════════════
-   My Rides section — Figma 82:20302
-   gap-8 col
-   ══════════════════════════════════════════════════════════════════ */
-.hs-rides-section {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+/* ── Scroll area below sticky — ride list or empty state ─── */
+.hs-card-content {
   flex: 1;
   min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding: 24px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.hs-card-content::-webkit-scrollbar { display: none; }
+
+/* When empty, centre the illustration in the available space */
+.hs-card-content.hs-card-content-empty {
+  align-items: center;
+  justify-content: center;
 }
 
-.hs-section-title {
-  font-family: 'Roboto', sans-serif;
-  font-size: 20px;
-  font-weight: 500;
-  line-height: 28px;
-  color: #1e1e1e;
-  margin: 0;
-}
-
-/* ── Segmented tabs — Figma 82:20303 ─────────────────────────
-   bg white, rounded 233, p-4 — inner "stretch" container h-36 */
+/* ── Segmented tabs — Figma 138:7134 (sub-bg #f5f5f5) ────── */
 .hs-tabbar {
-  background: #ffffff;
+  background: #f5f5f5;
   border-radius: 233px;
   padding: 4px;
   display: flex;
@@ -126,18 +138,23 @@
 
 .hs-tab {
   flex: 1;
+  min-width: 0;                      /* let flex shrink the inactive tab */
   height: 36px;
   background: transparent;
   border: none;
   border-radius: 100px;
-  padding: 8px 18px;
+  padding: 8px 12px;                 /* slimmed from 18 so 'I'm Getting a Ride' fits */
   cursor: pointer;
-  font-family: 'SF Pro', -apple-system, 'Inter', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro',
+               'Inter', 'Roboto', sans-serif;
   font-size: 15px;
   font-weight: 510;                  /* SF Pro Medium */
   line-height: 20px;
   letter-spacing: -0.23px;
   color: #1a1a1a;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
   transition: background 0.2s ease, color 0.2s ease;
 }
 
@@ -147,24 +164,15 @@
   font-weight: 700;                  /* SF Pro Bold */
 }
 
-/* Rides list */
-.hs-rides-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  flex: 1;
-  min-height: 0;
-}
-
-/* Empty state — Figma 83:20855 + 114:22130 (carpool illustration) */
+/* Empty state — Figma 138:7388 / 138:7727
+   carpool illustration + Roboto Light caption + (Driving) full-width CTA */
 .hs-empty-state {
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 24px 16px 16px;
+  gap: 32px;                 /* Figma gap between illustration+text and CTA */
+  width: 100%;
 }
 .hs-empty-illustration {
   width: 270px;
@@ -175,7 +183,7 @@
 .hs-empty-state p {
   font-family: 'Roboto', sans-serif;
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 300;          /* Roboto Light per Figma */
   line-height: 28px;
   color: #1e1e1e;
   text-align: center;
@@ -183,14 +191,9 @@
   letter-spacing: 0;
 }
 
-/* Empty-state secondary CTA — only rendered on the I'm Driving tab.
-   Reuses .hs-cta-secondary's outlined-orange treatment but constrains
-   width so it doesn't stretch the full card. */
+/* Empty-state secondary CTA on I'm Driving — full width per Figma 138:7383 */
 .hs-empty-cta {
-  margin-top: 4px;
-  align-self: center;
-  min-width: 220px;
-  padding: 0 28px;
+  width: 100%;
 }
 
 /* ══════════════════════════════════════════════════════════════════

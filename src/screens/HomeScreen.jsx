@@ -130,51 +130,60 @@ export default function HomeScreen() {
     openCall();
   }
 
+  const isRiding = myRidesTab === 'riding';
+
   return (
     <div className="hs-root">
-      {/* ═════ "Need to be anywhere?" card ═════ */}
-      <div className="hs-request-card">
-        <h2 className="hs-card-title">{t('home.cta.title')}</h2>
+      {/* Single white card. Tab bar + (on Getting-a-Ride) Need-to-be-somewhere
+          block stay constant at the top; ride list scrolls under them. */}
+      <div className="hs-card">
 
-        <div className="hs-cta-group">
-          <button
-            className="hs-cta-primary"
-            onClick={() => openRideFlow('search')}
-          >
-            <CarIcon size={24} style={{ color: '#f5f5f5' }} />
-            <span>{t('home.cta.request')}</span>
-          </button>
+        {/* Sticky cluster — tab bar + (conditional) request block */}
+        <div className="hs-card-sticky">
+          <div className="hs-tabbar" role="tablist">
+            <button
+              role="tab"
+              className={`hs-tab${myRidesTab === 'driving' ? ' active' : ''}`}
+              onClick={() => setMyRidesTab('driving')}
+            >
+              {t('home.tab.driving')}
+            </button>
+            <button
+              role="tab"
+              className={`hs-tab${isRiding ? ' active' : ''}`}
+              onClick={() => setMyRidesTab('riding')}
+            >
+              {t('home.tab.riding')}
+            </button>
+          </div>
 
-          <button
-            className="hs-cta-secondary"
-            onClick={handleCallForRide}
-          >
-            <PhoneIcon size={22} style={{ color: '#e85733' }} />
-            <span>{t('home.cta.call')}</span>
-          </button>
+          {isRiding && (
+            <div className="hs-request-block">
+              <p className="hs-request-title">{t('home.cta.title')}</p>
+              <div className="hs-request-buttons">
+                <button
+                  className="hs-cta-primary"
+                  onClick={() => openRideFlow('search')}
+                >
+                  <CarIcon size={24} style={{ color: '#f5f5f5' }} />
+                  <span>{t('home.cta.request')}</span>
+                </button>
+                <button
+                  className="hs-cta-secondary"
+                  onClick={handleCallForRide}
+                >
+                  <PhoneIcon size={22} style={{ color: '#e85733' }} />
+                  <span>{t('home.cta.call')}</span>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
-      </div>
 
-      {/* ═════ My Rides section ═════ */}
-      <div className="hs-rides-section">
-        <h2 className="hs-section-title">{t('home.myrides')}</h2>
-
-        <div className="hs-tabbar">
-          <button
-            className={`hs-tab${myRidesTab === 'driving' ? ' active' : ''}`}
-            onClick={() => setMyRidesTab('driving')}
-          >
-            {t('home.tab.driving')}
-          </button>
-          <button
-            className={`hs-tab${myRidesTab === 'riding' ? ' active' : ''}`}
-            onClick={() => setMyRidesTab('riding')}
-          >
-            {t('home.tab.riding')}
-          </button>
-        </div>
-
-        <div className="hs-rides-list">
+        {/* Scroll area — ride list, or empty state if none */}
+        <div
+          className={`hs-card-content${activeRides.length === 0 ? ' hs-card-content-empty' : ''}`}
+        >
           {activeRides.length === 0 ? (
             <EmptyState
               tab={myRidesTab}
@@ -186,6 +195,7 @@ export default function HomeScreen() {
             ))
           )}
         </div>
+
       </div>
     </div>
   );

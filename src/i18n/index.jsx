@@ -26,12 +26,12 @@ const dictionaries = {
     'header.tagline':      'Helping each other get around Zeeland!',
 
     /* — Home — */
-    'home.cta.title':      'Need to be anywhere?',
+    'home.cta.title':      'Need to be somewhere?',
     'home.cta.request':    'Request a Ride',
     'home.cta.call':       'Call for a Ride',
     'home.myrides':        'My Rides',
     'home.tab.driving':    "I'm Driving",
-    'home.tab.riding':     "I'm Riding",
+    'home.tab.riding':     "I'm Getting a Ride",
     'home.empty':          'You have no active rides at the moment.',
     'home.empty.browseCta':'See who needs a ride',
     'home.now':            'Now',
@@ -211,7 +211,7 @@ const dictionaries = {
     'home.cta.call':       'Bel voor een rit',
     'home.myrides':        'Mijn ritten',
     'home.tab.driving':    'Ik rijd',
-    'home.tab.riding':     'Ik reis mee',
+    'home.tab.riding':     'Ik krijg een rit',
     'home.empty':          'Je hebt op dit moment geen actieve ritten.',
     'home.empty.browseCta':'Kijk wie een rit nodig heeft',
     'home.now':            'Nu',
