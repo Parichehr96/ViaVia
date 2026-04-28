@@ -183,6 +183,16 @@
   letter-spacing: 0;
 }
 
+/* Empty-state secondary CTA — only rendered on the I'm Driving tab.
+   Reuses .hs-cta-secondary's outlined-orange treatment but constrains
+   width so it doesn't stretch the full card. */
+.hs-empty-cta {
+  margin-top: 4px;
+  align-self: center;
+  min-width: 220px;
+  padding: 0 28px;
+}
+
 /* ══════════════════════════════════════════════════════════════════
    Ride card — Figma 83:20748
    ══════════════════════════════════════════════════════════════════ */

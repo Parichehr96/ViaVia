@@ -86,7 +86,7 @@ function RideCard({ ride, onMoreInfo }) {
   );
 }
 
-function EmptyState() {
+function EmptyState({ tab, onBrowseCommunity }) {
   const t = useT();
   return (
     <div className="hs-empty-state">
@@ -96,6 +96,15 @@ function EmptyState() {
         className="hs-empty-illustration"
       />
       <p>{t('home.empty')}</p>
+      {tab === 'driving' && (
+        <button
+          type="button"
+          className="hs-cta-secondary hs-empty-cta"
+          onClick={onBrowseCommunity}
+        >
+          <span>{t('home.empty.browseCta')}</span>
+        </button>
+      )}
     </div>
   );
 }
@@ -105,6 +114,7 @@ export default function HomeScreen() {
     openRideFlow, rideRequests, acceptedRides, dismissedRides, openRideDetail,
     myRidesTab, setMyRidesTab,
     openCall,
+    setActiveTab,
   } = useApp();
   const t = useT();
 
@@ -166,7 +176,10 @@ export default function HomeScreen() {
 
         <div className="hs-rides-list">
           {activeRides.length === 0 ? (
-            <EmptyState />
+            <EmptyState
+              tab={myRidesTab}
+              onBrowseCommunity={() => setActiveTab('community')}
+            />
           ) : (
             activeRides.map(ride => (
               <RideCard key={ride.id} ride={ride} onMoreInfo={openRideDetail} />

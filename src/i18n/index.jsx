@@ -33,6 +33,7 @@ const dictionaries = {
     'home.tab.driving':    "I'm Driving",
     'home.tab.riding':     "I'm Riding",
     'home.empty':          'You have no active rides at the moment.',
+    'home.empty.browseCta':'See who needs a ride',
     'home.now':            'Now',
 
     /* — Wallet — */
@@ -212,6 +213,7 @@ const dictionaries = {
     'home.tab.driving':    'Ik rijd',
     'home.tab.riding':     'Ik reis mee',
     'home.empty':          'Je hebt op dit moment geen actieve ritten.',
+    'home.empty.browseCta':'Kijk wie een rit nodig heeft',
     'home.now':            'Nu',
 
     'wallet.balance':      'Tegoed',
