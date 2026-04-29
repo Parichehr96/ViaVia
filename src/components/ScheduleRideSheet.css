@@ -57,7 +57,7 @@
 
 .sched-title {
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 24px;
+  font-size: calc(24px + var(--fb, 0px));
   font-weight: 700;
   line-height: 1.2;
   color: #1a1a1a;
@@ -65,7 +65,7 @@
 }
 .sched-sub {
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 400;
   line-height: 1.4;
   color: #727272;
@@ -82,7 +82,7 @@
 }
 .sched-label {
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 500;
   color: #1a1a1a;
 }
@@ -105,7 +105,7 @@
 .sched-chip:active { background: #e6e9ea; }
 .sched-chip-text {
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 15px;
+  font-size: calc(15px + var(--fb, 0px));
   font-weight: 500;
   color: #1a1a1a;
 }
@@ -129,7 +129,7 @@
 /* Estimated dropoff line */
 .sched-est {
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 400;
   color: #1a1a1a;
   margin: 4px 0 0;
@@ -143,7 +143,7 @@
   border: none;
   padding: 0;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 500;
   color: #e85733;
   cursor: pointer;
@@ -158,7 +158,7 @@
   background: #2e3b3b;
   color: #f5f5f5;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s ease, transform 0.12s ease;

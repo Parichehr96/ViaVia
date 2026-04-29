@@ -5,7 +5,10 @@
    ══════════════════════════════════════════════════════════════════ */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-const STORAGE_KEY = 'viavia.locale';
+const STORAGE_KEY      = 'viavia.locale';
+const FONT_BOOST_KEY   = 'viavia.fontBoost';
+const FONT_BOOST_MIN   = 1;
+const FONT_BOOST_MAX   = 5;
 export const LOCALES = [
   { code: 'en', label: 'English',    native: 'English'    },
   { code: 'nl', label: 'Dutch',      native: 'Nederlands' },
@@ -96,6 +99,12 @@ const dictionaries = {
     'prefs.language':         'Language',
     'prefs.notifications':    'Notifications',
     'prefs.distance':         'Distance unit',
+    'prefs.fontSize':         'Font size',
+    'prefs.fontSize.level':   'Level {n}',
+    'prefs.fontSize.help':    'Pick how large you\'d like text to appear across the app. Level 1 is the default; each step up adds 1 px to every text element.',
+    'prefs.fontSize.previewTitle':'Preview',
+    'prefs.fontSize.previewBody': 'This is how regular paragraphs and ride details will look at this size.',
+    'prefs.fontSize.note':    'All text gets {n} px larger than the default.',
     'prefs.theme':            'Theme',
 
     /* — Language sub-page — */
@@ -270,6 +279,12 @@ const dictionaries = {
     'prefs.language':         'Taal',
     'prefs.notifications':    'Meldingen',
     'prefs.distance':         'Afstandseenheid',
+    'prefs.fontSize':         'Tekstgrootte',
+    'prefs.fontSize.level':   'Niveau {n}',
+    'prefs.fontSize.help':    'Kies hoe groot je tekst in de hele app wilt zien. Niveau 1 is de standaard; elke stap voegt 1 px toe aan elk tekstelement.',
+    'prefs.fontSize.previewTitle':'Voorbeeld',
+    'prefs.fontSize.previewBody': 'Zo zien gewone alinea\'s en ritdetails er bij dit niveau uit.',
+    'prefs.fontSize.note':    'Alle tekst is {n} px groter dan de standaard.',
     'prefs.theme':            'Thema',
 
     'lang.title':             'Taal',
@@ -403,7 +418,11 @@ function interpolate(str, vars) {
   return str.replace(/\{(\w+)\}/g, (_, k) => (k in vars ? String(vars[k]) : `{${k}}`));
 }
 
-const I18nContext = createContext({ locale: 'en', setLocale: () => {}, t: (k) => k });
+const I18nContext = createContext({
+  locale: 'en', setLocale: () => {},
+  fontBoost: 1, setFontBoost: () => {},
+  t: (k) => k,
+});
 
 export function I18nProvider({ children }) {
   const [locale, setLocaleState] = useState(() => {
@@ -412,13 +431,37 @@ export function I18nProvider({ children }) {
     return saved && dictionaries[saved] ? saved : 'en';
   });
 
+  // Font-size boost — integer 1..5. Each step above 1 adds 1px to every
+  // font-size in the app via the --fb CSS variable. Persisted alongside
+  // the locale because it's the same scope of "user preferences".
+  const [fontBoost, setFontBoostState] = useState(() => {
+    if (typeof localStorage === 'undefined') return FONT_BOOST_MIN;
+    const saved = Number(localStorage.getItem(FONT_BOOST_KEY));
+    return Number.isFinite(saved) && saved >= FONT_BOOST_MIN && saved <= FONT_BOOST_MAX
+      ? saved : FONT_BOOST_MIN;
+  });
+
   useEffect(() => {
     if (typeof localStorage !== 'undefined') localStorage.setItem(STORAGE_KEY, locale);
     if (typeof document !== 'undefined') document.documentElement.lang = locale;
   }, [locale]);
 
+  // Drive the global --fb variable by toggling .fb-N on <html>
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const html = document.documentElement;
+    for (let n = FONT_BOOST_MIN; n <= FONT_BOOST_MAX; n++) html.classList.remove(`fb-${n}`);
+    html.classList.add(`fb-${fontBoost}`);
+    if (typeof localStorage !== 'undefined') localStorage.setItem(FONT_BOOST_KEY, String(fontBoost));
+  }, [fontBoost]);
+
   const setLocale = useCallback((l) => {
     if (dictionaries[l]) setLocaleState(l);
+  }, []);
+
+  const setFontBoost = useCallback((n) => {
+    const v = Math.max(FONT_BOOST_MIN, Math.min(FONT_BOOST_MAX, Math.round(Number(n) || 1)));
+    setFontBoostState(v);
   }, []);
 
   const t = useCallback((key, vars) => {
@@ -428,8 +471,16 @@ export function I18nProvider({ children }) {
     return interpolate(value, vars);
   }, [locale]);
 
-  const value = useMemo(() => ({ locale, setLocale, t }), [locale, setLocale, t]);
+  const value = useMemo(
+    () => ({ locale, setLocale, fontBoost, setFontBoost, t }),
+    [locale, setLocale, fontBoost, setFontBoost, t]
+  );
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
+}
+
+export function useFontBoost() {
+  const { fontBoost, setFontBoost } = useContext(I18nContext);
+  return { fontBoost, setFontBoost, min: FONT_BOOST_MIN, max: FONT_BOOST_MAX };
 }
 
 export function useT() {

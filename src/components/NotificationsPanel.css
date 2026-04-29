@@ -58,7 +58,7 @@
 .np-title {
   flex: 1;
   font-family: 'Roboto', sans-serif;
-  font-size: 22px;
+  font-size: calc(22px + var(--fb, 0px));
   font-weight: 500;
   line-height: 28px;
   letter-spacing: 0px;
@@ -75,7 +75,7 @@
 /* Figma: Roboto Regular 14px, #ff6038, tracking 0.25px */
 .np-mark-read {
   font-family: 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 400;
   line-height: 20px;
   letter-spacing: 0.25px;
@@ -186,7 +186,7 @@
 .np-item-title {
   flex: 1;
   font-family: 'Roboto', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 600;
   line-height: 24px;
   letter-spacing: 0.15px;
@@ -197,7 +197,7 @@
 /* Figma: Roboto Regular 12px, #575757, tracking 0.4px */
 .np-item-time {
   font-family: 'Roboto', sans-serif;
-  font-size: 12px;
+  font-size: calc(12px + var(--fb, 0px));
   font-weight: 400;
   line-height: 16px;
   letter-spacing: 0.4px;
@@ -209,7 +209,7 @@
 /* Figma: Roboto Regular 14px, #333, tracking 0.25px, line-height 20px */
 .np-item-desc {
   font-family: 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 400;
   line-height: 20px;
   letter-spacing: 0.25px;
@@ -227,7 +227,7 @@
 .np-empty p {
   margin: 0;
   font-family: 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   color: #8e8e93;
   text-align: center;
 }

@@ -63,7 +63,18 @@
   --text-lg:    clamp(16px, 4vw,   18px);
   --text-xl:    clamp(18px, 4.5vw, 22px);
   --text-2xl:   clamp(22px, 5.5vw, 28px);
+
+  /* ── Accessibility: font-size boost (Profile → Preferences) ──
+     Level 1 = +0px (default), Level 5 = +4px. The number suffix
+     of the .fb-N class on <html> drives this. Every CSS rule in
+     src/ uses `font-size: calc(<base>px + var(--fb, 0px))`. */
+  --fb: 0px;
 }
+:root.fb-1 { --fb: 0px; }
+:root.fb-2 { --fb: 1px; }
+:root.fb-3 { --fb: 2px; }
+:root.fb-4 { --fb: 3px; }
+:root.fb-5 { --fb: 4px; }
 
 html, body {
   height: 100%;
@@ -243,7 +254,7 @@ input {
   border-radius: 50%;
   background: #ff6038;
   color: #ffffff;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -258,7 +269,7 @@ input {
 
 .ride-toast-title {
   font-family: 'Inter', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 600;
   line-height: 1.3;
   color: #ffffff;
@@ -266,7 +277,7 @@ input {
 
 .ride-toast-sub {
   font-family: 'Inter', sans-serif;
-  font-size: 12px;
+  font-size: calc(12px + var(--fb, 0px));
   font-weight: 400;
   line-height: 1.4;
   color: rgba(255, 255, 255, 0.72);
@@ -280,7 +291,7 @@ input {
   border-radius: 20px;
   padding: 7px 14px;
   font-family: 'Inter', sans-serif;
-  font-size: 13px;
+  font-size: calc(13px + var(--fb, 0px));
   font-weight: 600;
   color: #ff6038;
   white-space: nowrap;
@@ -294,5 +305,5 @@ input {
 }
 
 .leaflet-control-attribution {
-  font-size: 9px;
+  font-size: calc(9px + var(--fb, 0px));
 }

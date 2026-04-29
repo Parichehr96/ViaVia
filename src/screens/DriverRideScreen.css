@@ -61,7 +61,7 @@
   border-radius: 100px;
   padding: 11px 18px;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 600;
   color: #1a1a1a;
   text-align: center;
@@ -124,7 +124,7 @@
   align-items: center;
   justify-content: center;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 700;
   color: #1a1a1a;
   flex-shrink: 0;
@@ -139,7 +139,7 @@
 .drs-pax-name {
   margin: 0;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 600;
   color: #1a1a1a;
   letter-spacing: 0.15px;
@@ -147,7 +147,7 @@
 .drs-pax-sub {
   margin: 0;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 13px;
+  font-size: calc(13px + var(--fb, 0px));
   font-weight: 500;
   color: #727272;
 }
@@ -220,7 +220,7 @@
 .drs-route-place {
   margin: 0;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 15px;
+  font-size: calc(15px + var(--fb, 0px));
   font-weight: 600;
   color: #1a1a1a;
   white-space: nowrap;
@@ -240,7 +240,7 @@
   align-items: center;
   gap: 6px;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 500;
   color: #1a1a1a;
 }
@@ -251,7 +251,7 @@
   border: none;
   border-radius: 28px;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s ease, transform 0.12s ease;
@@ -274,7 +274,7 @@
   background: transparent;
   border: none;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 500;
   color: #b32e1f;
   cursor: pointer;
@@ -302,7 +302,7 @@
   margin: 0;
   text-align: center;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 22px;
+  font-size: calc(22px + var(--fb, 0px));
   font-weight: 700;
   color: #1a1a1a;
 }
@@ -310,7 +310,7 @@
   margin: -4px 0 8px;
   text-align: center;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   color: #727272;
 }
 
@@ -340,14 +340,14 @@
 }
 .drs-summary-stat-val {
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 18px;
+  font-size: calc(18px + var(--fb, 0px));
   font-weight: 700;
   color: #1a1a1a;
 }
 .drs-summary-stat-val.drs-summary-earnings { color: #ff6038; }
 .drs-summary-stat-lbl {
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 12px;
+  font-size: calc(12px + var(--fb, 0px));
   font-weight: 500;
   color: #727272;
   text-transform: uppercase;

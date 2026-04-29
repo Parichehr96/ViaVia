@@ -45,7 +45,7 @@
 .cs-friends-title {
   margin: 0;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 18px;
+  font-size: calc(18px + var(--fb, 0px));
   font-weight: 700;
   color: #ffffff;
   letter-spacing: 0.1px;
@@ -86,7 +86,7 @@
 
 .cs-section-title {
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 22px;
+  font-size: calc(22px + var(--fb, 0px));
   font-weight: 600;
   line-height: 28px;
   color: #1a1a1a;
@@ -102,7 +102,7 @@
   justify-content: center;
   flex-shrink: 0;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 13px;
+  font-size: calc(13px + var(--fb, 0px));
   font-weight: 600;
   color: #1e1e1e;
 }
@@ -123,7 +123,7 @@
   align-items: center;
   justify-content: center;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 13px;
+  font-size: calc(13px + var(--fb, 0px));
   font-weight: 600;
   color: #1e1e1e;
   flex-shrink: 0;
@@ -131,7 +131,7 @@
 .cs-friend-text { flex: 1; min-width: 0; }
 .cs-friend-name {
   font-family: 'Roboto', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 600;
   line-height: 24px;
   letter-spacing: 0.15px;
@@ -143,7 +143,7 @@
 }
 .cs-friend-rides {
   font-family: 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 500;
   line-height: 20px;
   letter-spacing: 0.1px;
@@ -175,7 +175,7 @@
   gap: 8px;
   cursor: pointer;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 400;
   line-height: 1;
   color: #1e1e1e;
@@ -216,7 +216,7 @@
   border-radius: 8px;
   cursor: pointer;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 15px;
+  font-size: calc(15px + var(--fb, 0px));
   color: #1e1e1e;
   transition: background 0.12s ease;
 }
@@ -238,7 +238,7 @@
 
 .cs-empty {
   font-family: 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   color: #757575;
   text-align: center;
   padding: 40px 0;
@@ -285,7 +285,7 @@
 .cs-ride-when {
   flex: 1;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 20px;
+  font-size: calc(20px + var(--fb, 0px));
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.4px;
@@ -306,7 +306,7 @@
 .cs-ride-name-row { display: flex; align-items: center; gap: 10px; }
 .cs-ride-name {
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 600;
   line-height: 1.4;
   color: #1e1e1e;
@@ -322,7 +322,7 @@
 }
 .cs-mutual-text {
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 400;
   line-height: 1.4;
   color: #1e1e1e;
@@ -372,7 +372,7 @@
 }
 .cs-route-place {
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 600;
   line-height: 1.4;
   color: #1e1e1e;
@@ -384,7 +384,7 @@
 
 .cs-ride-note {
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 400;
   line-height: 1.4;
   color: #757575;
@@ -406,7 +406,7 @@
   align-items: center;
   justify-content: center;
   font-family: 'Roboto', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 600;
   line-height: 24px;
   letter-spacing: 0.15px;
@@ -465,14 +465,14 @@
 }
 .cs-toast-title {
   font-family: 'Inter', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 600;
   color: #ffffff;
   margin: 0;
 }
 .cs-toast-sub {
   font-family: 'Inter', sans-serif;
-  font-size: 12px;
+  font-size: calc(12px + var(--fb, 0px));
   font-weight: 400;
   color: rgba(255, 255, 255, 0.72);
   margin: 2px 0 0;

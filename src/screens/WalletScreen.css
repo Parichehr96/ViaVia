@@ -68,7 +68,7 @@
 .ws-balance-label {
   margin: 0;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 500;
   line-height: 20px;
   color: #ffffff;
@@ -77,14 +77,14 @@
   transition: font-size 0.24s ease, color 0.24s ease;
 }
 .ws-hero.scrolled .ws-balance-label {
-  font-size: 13px;
+  font-size: calc(13px + var(--fb, 0px));
   color: #1a1a1a;
 }
 
 .ws-amount {
   margin: 0;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 36px;
+  font-size: calc(36px + var(--fb, 0px));
   font-weight: 700;
   line-height: 1.05;
   letter-spacing: -0.5px;
@@ -92,14 +92,14 @@
   transition: font-size 0.24s ease, color 0.24s ease;
 }
 .ws-hero.scrolled .ws-amount {
-  font-size: 22px;
+  font-size: calc(22px + var(--fb, 0px));
   color: #1a1a1a;
 }
 
 .ws-balance-sub {
   margin: 0;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 13px;
+  font-size: calc(13px + var(--fb, 0px));
   font-weight: 500;
   line-height: 18px;
   color: rgba(255, 255, 255, 0.78);
@@ -108,7 +108,7 @@
 }
 .ws-hero.scrolled .ws-balance-sub {
   color: #727272;
-  font-size: 12px;
+  font-size: calc(12px + var(--fb, 0px));
 }
 
 /* ── Action row (hides on scroll) ────────────────────────────── */
@@ -151,7 +151,7 @@
 }
 .ws-action-label {
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 13px;
+  font-size: calc(13px + var(--fb, 0px));
   font-weight: 500;
   line-height: 18px;
   color: #1a1a1a;
@@ -182,7 +182,7 @@
 .ws-offers-title {
   margin: 0 4px;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 22px;
+  font-size: calc(22px + var(--fb, 0px));
   font-weight: 600;
   line-height: 28px;
   color: #1a1a1a;
@@ -208,7 +208,7 @@
   padding: 8px 22px;
   height: 38px;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 15px;
+  font-size: calc(15px + var(--fb, 0px));
   font-weight: 500;
   line-height: 22px;
   color: #49454f;
@@ -262,7 +262,7 @@
 .ws-deal-name {
   flex: 1;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 600;
   line-height: 22px;
   color: #1a1a1a;
@@ -272,7 +272,7 @@
 }
 .ws-deal-time {
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 13px;
+  font-size: calc(13px + var(--fb, 0px));
   font-weight: 500;
   line-height: 18px;
   color: #8e8e93;
@@ -280,7 +280,7 @@
 }
 .ws-deal-desc {
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 400;
   line-height: 20px;
   color: #49454f;
@@ -299,7 +299,7 @@
 .ws-deal-credits {
   flex: 1;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 500;
   line-height: 20px;
   color: #1a1a1a;
@@ -310,7 +310,7 @@
   border-radius: 10px;
   padding: 8px 18px;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 600;
   line-height: 1;
   color: #e85733;

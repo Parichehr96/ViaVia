@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { useT, useLocale, LOCALES } from '../i18n';
+import { useT, useLocale, useFontBoost, LOCALES } from '../i18n';
 import {
   UserIcon, BellIcon, CarIcon, ClockIcon, StarIcon, HistoryIcon,
   ShieldIcon, HelpIcon, GlobeIcon, VerifiedIcon,
@@ -21,6 +21,7 @@ const PAGES = {
   HISTORY:     'history',
   PREFERENCES: 'preferences',
   LANGUAGE:    'language',
+  FONT_SIZE:   'font-size',
   PRIVACY:     'privacy',
   HELP:        'help',
 };
@@ -209,6 +210,7 @@ function HistoryPage({ onBack }) {
 function PreferencesPage({ onBack, onNavigate }) {
   const t = useT();
   const { locale } = useLocale();
+  const { fontBoost } = useFontBoost();
   const langName = LOCALES.find(l => l.code === locale)?.native || 'English';
   const [notif, setNotif] = useState(true);
   const [units, setUnits] = useState('km');
@@ -220,6 +222,18 @@ function PreferencesPage({ onBack, onNavigate }) {
             <GlobeIcon size={22} style={{ color: '#1a1a1a' }} />
             <span className="pp-row-label">{t('prefs.language')}</span>
             <span className="pp-row-value">{langName}</span>
+            <ChevronRightIcon size={14} style={{ color: 'rgba(0,0,0,0.4)' }} />
+          </button>
+        </li>
+        <li>
+          <button className="pp-row" onClick={() => onNavigate(PAGES.FONT_SIZE)}>
+            {/* Two stacked A glyphs as a quick visual cue for the font-size step */}
+            <span className="pp-row-glyph" aria-hidden="true">
+              <span className="pp-row-glyph-sm">A</span>
+              <span className="pp-row-glyph-lg">A</span>
+            </span>
+            <span className="pp-row-label">{t('prefs.fontSize')}</span>
+            <span className="pp-row-value">{t('prefs.fontSize.level', { n: fontBoost })}</span>
             <ChevronRightIcon size={14} style={{ color: 'rgba(0,0,0,0.4)' }} />
           </button>
         </li>
@@ -241,6 +255,45 @@ function PreferencesPage({ onBack, onNavigate }) {
           </button>
         </li>
       </ul>
+    </SubPage>
+  );
+}
+
+function FontSizePage({ onBack }) {
+  const t = useT();
+  const { fontBoost, setFontBoost, min, max } = useFontBoost();
+  const levels = [];
+  for (let n = min; n <= max; n++) levels.push(n);
+  return (
+    <SubPage title={t('prefs.fontSize')} onBack={onBack}>
+      <p className="pp-sub-help">{t('prefs.fontSize.help')}</p>
+
+      {/* Live preview — its inherited font-size scales with --fb */}
+      <div className="pp-fs-preview">
+        <p className="pp-fs-preview-title">{t('prefs.fontSize.previewTitle')}</p>
+        <p className="pp-fs-preview-body">{t('prefs.fontSize.previewBody')}</p>
+      </div>
+
+      {/* 1..5 segmented stepper */}
+      <div className="pp-fs-stepper" role="radiogroup" aria-label={t('prefs.fontSize')}>
+        {levels.map((n) => (
+          <button
+            key={n}
+            type="button"
+            role="radio"
+            aria-checked={fontBoost === n}
+            className={`pp-fs-step${fontBoost === n ? ' active' : ''}`}
+            onClick={() => setFontBoost(n)}
+          >
+            <span className="pp-fs-step-glyph" style={{ fontSize: `${12 + (n - 1) * 2}px` }}>A</span>
+            <span className="pp-fs-step-label">{n}</span>
+          </button>
+        ))}
+      </div>
+
+      <p className="pp-sub-help" style={{ marginTop: 4 }}>
+        {t('prefs.fontSize.note', { n: fontBoost - 1 })}
+      </p>
     </SubPage>
   );
 }
@@ -401,6 +454,7 @@ export default function ProfilePanel() {
         {page === PAGES.HISTORY     && <HistoryPage onBack={back} />}
         {page === PAGES.PREFERENCES && <PreferencesPage onBack={back} onNavigate={setPage} />}
         {page === PAGES.LANGUAGE    && <LanguagePage onBack={goPrefsBack} />}
+        {page === PAGES.FONT_SIZE   && <FontSizePage onBack={goPrefsBack} />}
         {page === PAGES.PRIVACY     && <PrivacyPage onBack={back} />}
         {page === PAGES.HELP        && <HelpPage onBack={back} />}
       </aside>

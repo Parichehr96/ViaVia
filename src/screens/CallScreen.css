@@ -39,7 +39,7 @@
 .cs-status {
   margin: 0;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 500;
   color: rgba(255, 255, 255, 0.7);
   letter-spacing: 0.4px;
@@ -47,7 +47,7 @@
 .cs-hotline {
   margin: 4px 0 0;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   color: rgba(255, 255, 255, 0.55);
 }
 
@@ -75,7 +75,7 @@
 }
 .cs-avatar-mark {
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 56px;
+  font-size: calc(56px + var(--fb, 0px));
   font-weight: 800;
   color: #ffffff;
   letter-spacing: -1px;
@@ -100,7 +100,7 @@
 .cs-name {
   margin: 4px 0 0;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 26px;
+  font-size: calc(26px + var(--fb, 0px));
   font-weight: 700;
   letter-spacing: 0.15px;
   color: #ffffff;
@@ -108,7 +108,7 @@
 .cs-sub {
   margin: 0;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 400;
   color: rgba(255, 255, 255, 0.65);
   max-width: 260px;
@@ -147,7 +147,7 @@
 .cs-control.on    .cs-control-face { background: #ffffff; }
 .cs-control-lbl {
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 12px;
+  font-size: calc(12px + var(--fb, 0px));
   font-weight: 500;
   color: rgba(255, 255, 255, 0.7);
   letter-spacing: 0.3px;
@@ -180,7 +180,7 @@
 .cs-end-lbl {
   margin: 0;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 13px;
+  font-size: calc(13px + var(--fb, 0px));
   font-weight: 500;
   color: rgba(255, 255, 255, 0.6);
 }

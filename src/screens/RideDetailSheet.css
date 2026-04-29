@@ -45,7 +45,7 @@
 
 .rds-header-title {
   font-family: 'Inter', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 500;
   color: #1e1e1e;
   flex: 1;
@@ -134,7 +134,7 @@
   background: #2e3b3b;
   color: #ffffff;
   font-family: 'Inter', sans-serif;
-  font-size: 18px;
+  font-size: calc(18px + var(--fb, 0px));
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -157,7 +157,7 @@
 
 .rds-name {
   font-family: 'Inter', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 600;
   color: #1e1e1e;
   line-height: 1.4;
@@ -169,7 +169,7 @@
   border-radius: 100px;
   padding: 2px 10px;
   font-family: 'Inter', sans-serif;
-  font-size: 12px;
+  font-size: calc(12px + var(--fb, 0px));
   font-weight: 600;
 }
 
@@ -187,14 +187,14 @@
 
 .rds-verified-text {
   font-family: 'Inter', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 400;
   color: #727272;
 }
 
 .rds-communities {
   font-family: 'Inter', sans-serif;
-  font-size: 13px;
+  font-size: calc(13px + var(--fb, 0px));
   font-weight: 400;
   color: #9ca3af;
 }
@@ -240,7 +240,7 @@
 .rds-info-text {
   flex: 1;
   font-family: 'Inter', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 400;
   color: #1e1e1e;
   line-height: 1.4;
@@ -256,7 +256,7 @@
 
 .rds-pickup-note {
   font-family: 'Inter', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 400;
   color: #757575;
   line-height: 1.4;
@@ -278,7 +278,7 @@
 
 .rds-accept-btn-text {
   font-family: 'Inter', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 400;
   color: #f5f5f5;
 }
@@ -297,7 +297,7 @@
   justify-content: center;
   gap: 8px;
   font-family: 'Inter', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 600;
   color: #e85733;
   flex-shrink: 0;
@@ -333,7 +333,7 @@
 
 .rds-start-btn-text {
   font-family: 'Inter', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 600;
   color: #ffffff;
 }

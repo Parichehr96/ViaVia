@@ -48,7 +48,7 @@
 .hs-request-title {
   margin: 0;
   font-family: 'Roboto', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 300;            /* Roboto Light */
   line-height: 28px;
   color: #1e1e1e;
@@ -76,7 +76,7 @@
   cursor: pointer;
   color: #f5f5f5;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 400;
   line-height: 1;
   transition: transform 0.12s ease, background 0.2s ease;
@@ -98,7 +98,7 @@
   cursor: pointer;
   color: #e85733;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 400;
   line-height: 1;
   transition: background 0.15s ease;
@@ -147,7 +147,7 @@
   cursor: pointer;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro',
                'Inter', 'Roboto', sans-serif;
-  font-size: 15px;
+  font-size: calc(15px + var(--fb, 0px));
   font-weight: 510;                  /* SF Pro Medium */
   line-height: 20px;
   letter-spacing: -0.23px;
@@ -182,7 +182,7 @@
 }
 .hs-empty-state p {
   font-family: 'Roboto', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 300;          /* Roboto Light per Figma */
   line-height: 28px;
   color: #1e1e1e;
@@ -218,7 +218,7 @@
 .hs-ride-when {
   flex: 1;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 20px;
+  font-size: calc(20px + var(--fb, 0px));
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.4px;
@@ -255,7 +255,7 @@
   align-items: center;
   justify-content: center;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 13px;
+  font-size: calc(13px + var(--fb, 0px));
   font-weight: 600;
   color: #1e1e1e;
 }
@@ -273,7 +273,7 @@
 }
 .hs-ride-name {
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 600;
   line-height: 1.4;
   color: #1e1e1e;
@@ -296,7 +296,7 @@
 }
 .hs-mutual-text {
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 400;
   line-height: 1.4;
   color: #1e1e1e;
@@ -347,7 +347,7 @@
 }
 .hs-route-place {
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 600;
   line-height: 1.4;
   color: #1e1e1e;
@@ -366,7 +366,7 @@
   border-radius: 8px;
   cursor: pointer;
   font-family: 'Roboto', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 600;
   line-height: 24px;
   letter-spacing: 0.15px;

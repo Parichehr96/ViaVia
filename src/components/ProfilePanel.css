@@ -89,7 +89,7 @@
 /* Figma: Roboto SemiBold 16px, #000, tracking 0.15px, line-height 24px */
 .pp-name {
   font-family: 'Roboto', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 600;
   line-height: 24px;
   letter-spacing: 0.15px;
@@ -100,7 +100,7 @@
 /* Figma: Roboto Regular 12px, #333, tracking 0.4px, line-height 16px */
 .pp-role {
   font-family: 'Roboto', sans-serif;
-  font-size: 12px;
+  font-size: calc(12px + var(--fb, 0px));
   font-weight: 400;
   line-height: 16px;
   letter-spacing: 0.4px;
@@ -162,7 +162,7 @@
 /* Figma: Roboto Regular 16px, #1d1b20, tracking 0.5px, line-height 24px */
 .pp-stat-val {
   font-family: 'Roboto', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 400;
   line-height: 24px;
   letter-spacing: 0.5px;
@@ -173,7 +173,7 @@
 /* Figma: Roboto Regular 12px, #8e8e93, tracking 0.4px, line-height 16px */
 .pp-stat-lbl {
   font-family: 'Roboto', sans-serif;
-  font-size: 12px;
+  font-size: calc(12px + var(--fb, 0px));
   font-weight: 400;
   line-height: 16px;
   letter-spacing: 0.4px;
@@ -245,7 +245,7 @@
   flex: 1;
   min-width: 0;
   font-family: 'Roboto', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   font-weight: 400;
   line-height: 24px;
   letter-spacing: 0.5px;
@@ -265,7 +265,7 @@
 /* Trailing value text on a row (e.g. "English" next to "Language") */
 .pp-item-value {
   font-family: 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   color: #8e8e93;
   margin-right: 4px;
 }
@@ -310,7 +310,7 @@
   flex: 1;
   margin: 0;
   font-family: 'Roboto', sans-serif;
-  font-size: 18px;
+  font-size: calc(18px + var(--fb, 0px));
   font-weight: 600;
   letter-spacing: 0.15px;
   color: #1a1a1a;
@@ -333,7 +333,7 @@
 .pp-sub-help {
   margin: 0 0 4px;
   font-family: 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   color: #727272;
   line-height: 1.45;
 }
@@ -342,14 +342,14 @@
 .pp-prose {
   margin: 0;
   font-family: 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   line-height: 1.55;
   color: #1a1a1a;
 }
 .pp-section-title {
   margin: 8px 0 0;
   font-family: 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.6px;
@@ -366,7 +366,7 @@
 }
 .pp-form-label {
   font-family: 'Roboto', sans-serif;
-  font-size: 13px;
+  font-size: calc(13px + var(--fb, 0px));
   font-weight: 500;
   color: #727272;
   letter-spacing: 0.2px;
@@ -377,7 +377,7 @@
   outline: none;
   padding: 0;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   color: #1a1a1a;
 }
 
@@ -415,23 +415,23 @@
 .pp-row-label {
   flex: 1;
   font-family: 'Roboto', sans-serif;
-  font-size: 16px;
+  font-size: calc(16px + var(--fb, 0px));
   color: #1a1a1a;
   letter-spacing: 0.15px;
 }
 .pp-row-sub {
   font-family: 'Roboto', sans-serif;
-  font-size: 12px;
+  font-size: calc(12px + var(--fb, 0px));
   color: #8e8e93;
 }
 .pp-row-value {
   font-family: 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   color: #8e8e93;
 }
 .pp-row-price {
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 600;
   color: #1a1a1a;
 }
@@ -478,7 +478,7 @@
   background: #f1f3f4;
   border: 1px solid transparent;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 13px;
+  font-size: calc(13px + var(--fb, 0px));
   font-weight: 600;
   color: #727272;
   cursor: pointer;
@@ -499,7 +499,7 @@
   background: transparent;
   color: #e85733;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: calc(14px + var(--fb, 0px));
   font-weight: 600;
   cursor: pointer;
 }
@@ -516,7 +516,84 @@
   align-items: center;
   justify-content: center;
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 12px;
+  font-size: calc(12px + var(--fb, 0px));
   font-weight: 700;
   color: #1a1a1a;
 }
+
+/* ── Glyph pair used as a leading icon for the Font size row ── */
+.pp-row-glyph {
+  flex-shrink: 0;
+  width: 24px;
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
+  color: #1a1a1a;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-weight: 700;
+  line-height: 1;
+}
+.pp-row-glyph-sm { font-size: 12px; }
+.pp-row-glyph-lg { font-size: 18px; }
+
+/* ── Font-size sub-page: live preview card + 1..5 stepper ──── */
+.pp-fs-preview {
+  background: #f6f7f8;
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pp-fs-preview-title {
+  margin: 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: calc(16px + var(--fb, 0px));
+  font-weight: 600;
+  color: #1a1a1a;
+}
+.pp-fs-preview-body {
+  margin: 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: calc(14px + var(--fb, 0px));
+  color: #49454f;
+  line-height: 1.45;
+}
+
+.pp-fs-stepper {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+.pp-fs-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 0 8px;
+  background: #f1f3f4;
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.pp-fs-step:hover { background: #e6e9ea; }
+.pp-fs-step.active {
+  background: rgba(255, 96, 56, 0.10);
+  border-color: #ff6038;
+}
+.pp-fs-step-glyph {
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-weight: 700;
+  color: #1a1a1a;
+  line-height: 1;
+}
+.pp-fs-step-label {
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: calc(11px + var(--fb, 0px));
+  font-weight: 600;
+  color: #727272;
+  letter-spacing: 0.4px;
+}
+.pp-fs-step.active .pp-fs-step-label { color: #e85733; }
