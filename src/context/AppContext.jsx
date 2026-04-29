@@ -25,7 +25,7 @@ export function AppProvider({ children }) {
   const [dismissedRides, setDismissedRides] = useState(new Set());
   const [selectedRide, setSelectedRide] = useState(null);
   const [targetCommunityTab, setTargetCommunityTab] = useState(null); // null | 'all' | 'mine'
-  const [myRidesTab, setMyRidesTab] = useState('driving'); // 'driving' | 'riding' — Ride-page sub-tab
+  const [myRidesTab, setMyRidesTab] = useState('riding'); // 'driving' | 'riding' — landing tab is "I'm Getting a Ride"
 
   // ── New ride flow state ──────────────────────────────────────────
   const [activeRide, setActiveRide] = useState(null);
